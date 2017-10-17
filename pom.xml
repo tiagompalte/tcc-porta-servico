@@ -1,11 +1,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>br.com.utfpr</groupId>
-  <artifactId>porta-servico</artifactId>
+  <groupId>com.github.tiagompalte</groupId>
+  <artifactId>tcc-porta-servico</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
-  <name>PortaServico</name>
+  <name>tcc-porta-servico</name>
+  <description>Projeto serviço que realiza acesso ao banco de dados para o projeto API e web</description>
+  <url>http://github.com/tiagompalte/tcc-porta-servico</url>
+  
+  <issueManagement>
+	<url>https://github.com/tiagompalte/tcc-porta-servico/issues</url>
+	<system>GitHub Issues</system>  
+  </issueManagement>
+  
+  <developers>
+  	<developer>
+  		<name>Tiago Mariani Palte</name>
+	   	<email>tiagompalte@hotmail.com</email>
+	   	<url>http://github.com/tiagompalte</url>
+	   	<id>tiagompalte</id>
+  	</developer>
+  </developers>
+  <scm>
+  	<connection>scm:git:git://github.com/tiagompalte/tcc-porta-servico.git</connection>
+  	<developerConnection>scm:git:ssh://github.com/tiagompalte/tcc-porta-servico.git</developerConnection>
+  	<url>http://github.com/tiagompalte/tcc-porta-servico/tree/master</url>
+  </scm>
+  
+  <licenses>
+	<license>
+		<name>MIT License</name>
+		<url>http://www.opensource.org/licenses/mit-license.php</url>
+		<distribution>repo</distribution>
+	</license>
+  </licenses>
 
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,9 +66,19 @@
 		<jackson-core.version>2.7.5</jackson-core.version>	
 		
 		<!-- Apache Bean Utils -->
-		<commons-beanutils.version>1.9.2</commons-beanutils.version>
-		
+		<commons-beanutils.version>1.9.2</commons-beanutils.version>		
 	</properties>
+	
+	<distributionManagement>
+	  <snapshotRepository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	  <repository>
+		<id>ossrh</id>
+		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	  </repository>
+	</distributionManagement>
 	
 	<build>
 		<plugins>
@@ -50,15 +89,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>${maven-war-pluging.version}</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
-			</plugin>
+			</plugin>			
 			<plugin>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-maven-plugin</artifactId>
@@ -67,6 +98,57 @@
 					<driver>com.mysql.jdbc.Driver</driver>
 				</configuration>
 			</plugin>
+			<plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-source-plugin</artifactId>
+		      <version>2.2.1</version>
+		      <executions>
+		        <execution>
+		          <id>attach-sources</id>
+		          <goals>
+		            <goal>jar-no-fork</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-javadoc-plugin</artifactId>
+		      <version>2.9.1</version>
+		      <executions>
+		        <execution>
+		          <id>attach-javadocs</id>
+		          <goals>
+		            <goal>jar</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-gpg-plugin</artifactId>
+		      <version>1.5</version>
+		      <executions>
+		        <execution>
+		          <id>sign-artifacts</id>
+		          <phase>verify</phase>
+		          <goals>
+		            <goal>sign</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>	
+		    <plugin>
+			  <groupId>org.sonatype.plugins</groupId>
+			  <artifactId>nexus-staging-maven-plugin</artifactId>
+			  <version>1.6.7</version>
+			  <extensions>true</extensions>
+			  <configuration>
+			     <serverId>ossrh</serverId>
+			     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+			     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+			  </configuration>
+			</plugin>		
 		</plugins>
 	</build>
 	
@@ -179,17 +261,5 @@
 			<scope>compile</scope>
 		</dependency>
 						
-	</dependencies>
-	
-	<repositories>
-		<repository>
-			<id>sonatype-nexus-snapshots</id>
-    		<name>Sonatype Nexus Snapshots</name>
-    		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    		<snapshots>
-      			<enabled>true</enabled>
-    		</snapshots>
-		</repository>
-	</repositories>
-  
+	</dependencies>	  
 </project>
