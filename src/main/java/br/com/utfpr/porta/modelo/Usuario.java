@@ -91,6 +91,7 @@ public class Usuario implements Serializable {
 		return codigo.toString().concat(" - ").concat(pessoa.getNome());
 	}
 		
+	@JsonIgnore
 	public boolean isNovo() {
 		return codigo == null;
 	}
