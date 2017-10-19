@@ -38,10 +38,10 @@ public class Estabelecimento implements Serializable {
 	private Pessoa responsavel;
 	
 	@Transient
-	private Integer quantidadeUsuarios;
+	private Long quantidadeUsuarios;
 	
 	@Transient
-	private Integer quantidadePortas;
+	private Long quantidadePortas;
 	
 	public boolean isNovo() {
 		return codigo == null;
@@ -83,19 +83,19 @@ public class Estabelecimento implements Serializable {
 		this.responsavel = responsavel;
 	}
 	
-	public Integer getQuantidadeUsuarios() {
+	public Long getQuantidadeUsuarios() {
 		return quantidadeUsuarios;
 	}
 
-	public void setQuantidadeUsuarios(Integer quantidadeUsuarios) {
+	public void setQuantidadeUsuarios(Long quantidadeUsuarios) {
 		this.quantidadeUsuarios = quantidadeUsuarios;
 	}
 
-	public Integer getQuantidadePortas() {
+	public Long getQuantidadePortas() {
 		return quantidadePortas;
 	}
 
-	public void setQuantidadePortas(Integer quantidadePortas) {
+	public void setQuantidadePortas(Long quantidadePortas) {
 		this.quantidadePortas = quantidadePortas;
 	}
 
