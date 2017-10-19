@@ -11,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,11 +35,6 @@ public class Log implements Serializable {
 	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 	
-	@PrePersist
-	private void prePersist() {
-		this.dataHora = LocalDateTime.now();
-	}
-
 	public Long getId() {
 		return id;
 	}
