@@ -3,6 +3,7 @@ package br.com.utfpr.porta.modelo;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -72,9 +73,13 @@ public class Usuario implements Serializable {
 		
 	@JsonIgnore
 	private String rfid;
-	
-	@Transient // por enquanto transiente
+		
+	@Transient
 	private String audio;
+	
+	@JsonIgnore
+	@Column(name = "nome_audio")
+	private String nomeAudio;
 	
 	public Usuario() {
 		pessoa = new Pessoa();
@@ -155,9 +160,17 @@ public class Usuario implements Serializable {
 	public String getAudio() {
 		return audio;
 	}
-
+	
 	public void setAudio(String audio) {
 		this.audio = audio;
+	}
+	
+	public String getNomeAudio() {
+		return nomeAudio;
+	}
+	
+	public void setNomeAudio(String nomeAudio) {
+		this.nomeAudio = nomeAudio;
 	}
 	
 	public Estabelecimento getEstabelecimento() {

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.tiagompalte</groupId>
   <artifactId>tcc-porta-servico</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>jar</packaging>
   <name>tcc-porta-servico</name>
   <description>Projeto serviço que realiza acesso ao banco de dados para o projeto API e web</description>
@@ -66,7 +66,10 @@
 		<jackson-core.version>2.7.5</jackson-core.version>	
 		
 		<!-- Apache Bean Utils -->
-		<commons-beanutils.version>1.9.2</commons-beanutils.version>		
+		<commons-beanutils.version>1.9.2</commons-beanutils.version>
+				
+		<!-- AWS SDK - S3 -->
+		<aws-java-sdk-s3.version>1.10.77</aws-java-sdk-s3.version>		
 	</properties>
 	
 	<distributionManagement>
@@ -259,6 +262,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
 			<scope>compile</scope>
+		</dependency>
+		
+		<!-- AWS SDK - S3 -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>${aws-java-sdk-s3.version}</version>
 		</dependency>
 						
 	</dependencies>	  
