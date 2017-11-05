@@ -21,10 +21,16 @@ public class AudioStorageLocal implements AudioStorage {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AudioStorageLocal.class);
 	
 	private Path local;
-	private Path localTemporario;
 	
 	public AudioStorageLocal() {
-		this(getDefault().getPath(System.getenv("HOME"), ".portaaudios"));
+		String os = System.getProperty("os.name").toLowerCase();
+		if(!StringUtils.isEmpty(os) && os.indexOf("win") >= 0) {
+			this.local = getDefault().getPath(System.getenv("USERPROFILE"), ".portaaudios");
+		}
+		else {
+			this.local = getDefault().getPath(System.getenv("HOME"), ".portaaudios");
+		}
+		criarPastas();
 	}
 	
 	public AudioStorageLocal(Path path) {
@@ -33,34 +39,16 @@ public class AudioStorageLocal implements AudioStorage {
 	}
 
 	@Override
-	public void salvarTemporariamente(String name, MultipartFile file) {
+	public void salvar(String name, MultipartFile file) {
 		if (file != null && !StringUtils.isEmpty(name)) {
 			try {
-				file.transferTo(new File(this.localTemporario.toAbsolutePath().toString() + getDefault().getSeparator() + name));
+				//Verifica se o áudio já existe na pasta, para gravar uma nova senha falada no lugar, nos casos de modificação
+				Files.deleteIfExists(this.local.resolve(name));
+				file.transferTo(new File(this.local.toAbsolutePath().toString() + getDefault().getSeparator() + name));
 			} catch (IOException e) {
-				throw new RuntimeException("Erro salvando o audio na pasta temporário", e);
+				throw new RuntimeException("Erro ao salvar o áudio", e);
 			}
 		}
-	}
-	
-	@Override
-	public byte[] recuperarAudioTemporaria(String nome) {
-		try {
-			return Files.readAllBytes(this.localTemporario.resolve(nome));
-		} catch (IOException e) {
-			throw new RuntimeException("Erro lendo o audio temporário", e);
-		}
-	}
-	
-	@Override
-	public void salvar(String audio) {
-		try {
-			//Verifica se o áudio já existe na pasta permanente. Para modificações das senhas faladas
-			Files.deleteIfExists(this.local.resolve(audio));
-			Files.move(this.localTemporario.resolve(audio), this.local.resolve(audio));
-		} catch (IOException e) {
-			throw new RuntimeException("Erro movendo o audio para destino final", e);
-		}		
 	}
 	
 	@Override
@@ -68,7 +56,7 @@ public class AudioStorageLocal implements AudioStorage {
 		try {
 			return Files.readAllBytes(this.local.resolve(nome));
 		} catch (IOException e) {
-			throw new RuntimeException("Erro lendo o audio", e);
+			throw new RuntimeException("Erro lendo o áudio", e);
 		}
 	}
 	
@@ -89,16 +77,13 @@ public class AudioStorageLocal implements AudioStorage {
 	private void criarPastas() {
 		try {
 			Files.createDirectories(this.local);
-			this.localTemporario = getDefault().getPath(this.local.toString(), "temp");
-			Files.createDirectories(this.localTemporario);
 			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Pastas criadas para salvar audios.");
+				LOGGER.debug("Pasta criada para salvar áudios.");
 				LOGGER.debug("Pasta default: " + this.local.toAbsolutePath());
-				LOGGER.debug("Pasta temporária: " + this.localTemporario.toAbsolutePath());
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Erro criando pasta para salvar audio", e);
+			throw new RuntimeException("Erro criando pasta para salvar áudio", e);
 		}
 	}
 	

@@ -98,8 +98,7 @@ public class AutorizacaoServico {
 				autorizacao.getId().getUsuario().getCodigo(), autorizacao.getId().getPorta().getCodigo());
 		
 		Long sequencia = Long.valueOf(1);
-			
-		
+					
 		if(lista != null && !lista.isEmpty()) {
 			
 			for(Autorizacao aut : lista) {

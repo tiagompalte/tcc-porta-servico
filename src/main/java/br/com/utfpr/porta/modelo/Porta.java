@@ -34,7 +34,6 @@ public class Porta implements Serializable {
 	@Size(max = 50, message = "O tamanho da descrição deve estar entre 1 e 50")
 	private String descricao;
 	
-	@JsonIgnore
 	@NotBlank(message = "A senha é obrigatória")
 	@Column(updatable = false)
 	private String senha;
@@ -54,6 +53,7 @@ public class Porta implements Serializable {
 		return codigoDescricao;
 	}
 	
+	@JsonIgnore
 	public boolean isNovo() {
 		return codigo == null;
 	}

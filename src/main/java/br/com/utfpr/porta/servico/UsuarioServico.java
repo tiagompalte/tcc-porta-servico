@@ -15,6 +15,7 @@ import br.com.utfpr.porta.repositorio.Pessoas;
 import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.EmailUsuarioJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
+import br.com.utfpr.porta.servico.excecao.RfidUsuarioJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.SenhaObrigatoriaUsuarioExcecao;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
@@ -39,6 +40,11 @@ public class UsuarioServico {
 			throw new EmailUsuarioJaCadastradoExcecao("E-mail já cadastrado");
 		}
 		
+		Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
+		if (usuarioExistenteRFID.isPresent() && !usuarioExistenteRFID.get().equals(usuario)) {
+			throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+		}
+		
 		if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenha())) {
 			throw new SenhaObrigatoriaUsuarioExcecao("Senha é obrigatória para novo usuário");
 		}
@@ -49,6 +55,10 @@ public class UsuarioServico {
 				
 		if(usuario.getPessoa() == null) {
 			throw new NullPointerException("Dados pessoais não informado");
+		}
+		
+		if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+			throw new NullPointerException("Senha falada não informada");
 		}
 		
 		Pessoa pessoaSalva = pessoasRepositorio.save(usuario.getPessoa());

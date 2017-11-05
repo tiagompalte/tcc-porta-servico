@@ -15,7 +15,7 @@ public interface Usuarios extends JpaRepository<Usuario, Long>, UsuariosQueries 
 	
 	public Optional<Usuario> findByEmail(String email);
 	
-	public Usuario findByRfid(String rfid);
+	public Optional<Usuario> findByRfid(String rfid);
 
 	public List<Usuario> findByEstabelecimentoAndCodigoIn(Estabelecimento estabelecimento, Long[] codigos);
 	

@@ -32,7 +32,7 @@ public class AudioStorageS3 implements AudioStorage {
 	private AmazonS3 amazonS3;
 
 	@Override
-	public void salvarTemporariamente(String name, MultipartFile file) {
+	public void salvar(String name, MultipartFile file) {
 		
 		if (file != null && !StringUtils.isEmpty(name)) {
 			
@@ -44,18 +44,6 @@ public class AudioStorageS3 implements AudioStorage {
 				throw new RuntimeException("Erro salvando arquivo no S3", e);
 			}
 		}
-	}
-
-	@Override
-	public byte[] recuperarAudioTemporaria(String nome) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void salvar(String audio) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
