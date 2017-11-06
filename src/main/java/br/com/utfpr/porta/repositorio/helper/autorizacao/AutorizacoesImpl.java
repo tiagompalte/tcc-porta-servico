@@ -38,6 +38,24 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 		criteria.addOrder(Order.asc("tipoAutorizacao"));
 		return criteria.list();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	public List<Autorizacao> findByCodigoPorta(Long codigoPorta) {		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Autorizacao.class);		
+		criteria.add(Restrictions.eq("id.porta.codigo", codigoPorta));		
+		criteria.addOrder(Order.asc("tipoAutorizacao"));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	public List<Autorizacao> findByCodigoUsuario(Long codigoUsuario) {		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Autorizacao.class);		
+		criteria.add(Restrictions.eq("id.usuario.codigo", codigoUsuario));		
+		criteria.addOrder(Order.asc("tipoAutorizacao"));
+		return criteria.list();
+	}
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)

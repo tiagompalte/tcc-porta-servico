@@ -12,6 +12,10 @@ public interface AutorizacoesQueries {
 	
 	public List<Autorizacao> findByCodigoUsuarioAndCodigoPorta(Long codigoUsuario, Long codigoPorta);
 	
+	public List<Autorizacao> findByCodigoPorta(Long codigoPorta);
+	
+	public List<Autorizacao> findByCodigoUsuario(Long codigoUsuario);
+	
 	public Page<Autorizacao> filtrar(AutorizacaoFiltro filtro, Pageable pageable);
 
 }
