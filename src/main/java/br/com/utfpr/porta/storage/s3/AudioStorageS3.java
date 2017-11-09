@@ -34,31 +34,44 @@ public class AudioStorageS3 implements AudioStorage {
 	@Override
 	public void salvar(String name, MultipartFile file) {
 		
-		if (file != null && !StringUtils.isEmpty(name)) {
-			
+		if (file != null && !StringUtils.isEmpty(name)) {			
 			try {
 				AccessControlList acl = new AccessControlList();
-				acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);				
+				acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);	
+				verificarExistenciaAudio(name);
 				enviarAudio(name, file, acl);
 			} catch (IOException e) {
+				LOGGER.error("Erro salvando arquivo no S3".concat(e.getMessage()));
 				throw new RuntimeException("Erro salvando arquivo no S3", e);
+			} catch(Exception e) {
+				LOGGER.error(e.getMessage());
 			}
 		}
 	}
 
 	@Override
-	public byte[] recuperar(String audio) {
-		InputStream is = amazonS3.getObject(BUCKET, audio).getObjectContent();
+	public byte[] recuperar(String audio) {	
+		
+		if(StringUtils.isEmpty(audio)) {
+			return null;
+		}
+		
 		try {
+			InputStream is = amazonS3.getObject(BUCKET, audio).getObjectContent();
 			return IOUtils.toByteArray(is);
 		} catch (IOException e) {
-			LOGGER.error("Não conseguiu recuperar áudio do S3", e);
+			LOGGER.error(String.format("Não conseguiu recuperar o áudio %s do S3", audio).concat(e.getMessage()));
+		} catch (NullPointerException e) {
+			LOGGER.error(String.format("O áudio %s não existe. ", audio).concat(e.getMessage()));
 		}
 		return null;
 	}
 
 	@Override
 	public void excluir(String audio) {
+		if(StringUtils.isEmpty(audio)) {
+			return;
+		}		
 		amazonS3.deleteObjects(new DeleteObjectsRequest(BUCKET).withKeys(audio));
 	}
 
@@ -70,12 +83,27 @@ public class AudioStorageS3 implements AudioStorage {
 		return null;
 	}
 	
-	private ObjectMetadata enviarAudio(String novoNome, MultipartFile arquivo, AccessControlList acl) throws IOException {
+	private void verificarExistenciaAudio(String audio) {
+		
+		InputStream is;
+		try {
+			is = amazonS3.getObject(BUCKET, audio).getObjectContent();			
+		}
+		catch(Exception e) {
+			is = null;
+		}
+		
+		if(is != null) {
+			excluir(audio);
+		}
+		
+	}
+	
+	private ObjectMetadata enviarAudio(String novoNome, MultipartFile file, AccessControlList acl) throws IOException {
 		ObjectMetadata metadata = new ObjectMetadata();
-		metadata.setContentType(arquivo.getContentType());
-		metadata.setContentLength(arquivo.getSize());
-		amazonS3.putObject(new PutObjectRequest(BUCKET, novoNome, arquivo.getInputStream(), metadata)
-					.withAccessControlList(acl));
+		metadata.setContentType(file.getContentType());
+		metadata.setContentLength(file.getSize());
+		amazonS3.putObject(new PutObjectRequest(BUCKET, novoNome, file.getInputStream(), metadata).withAccessControlList(acl));
 		return metadata;
 	}
 
