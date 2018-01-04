@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.utfpr.porta.modelo.Endereco;
 import br.com.utfpr.porta.modelo.Estabelecimento;
-import br.com.utfpr.porta.modelo.Pessoa;
+import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Enderecos;
 import br.com.utfpr.porta.repositorio.Estabelecimentos;
-import br.com.utfpr.porta.repositorio.Pessoas;
+import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
@@ -25,7 +25,7 @@ public class EstabelecimentoServico {
 	private Enderecos enderecosRespositorio;
 	
 	@Autowired
-	private Pessoas pessoasRepositorio;
+	private Usuarios usuariosRepositorio;
 	
 	@Transactional
 	public void salvar(Estabelecimento estabelecimento) {
@@ -50,14 +50,14 @@ public class EstabelecimentoServico {
 		
 		estabelecimento.setEndereco(enderecoSalvo);
 		
-		Pessoa pessoaSalva = pessoasRepositorio.save(estabelecimento.getResponsavel());
+		Usuario usuarioSalvo = usuariosRepositorio.save(estabelecimento.getResponsavel());
 		
-		if(pessoaSalva == null || pessoaSalva.getCodigo() == null) {
+		if(usuarioSalvo == null || usuarioSalvo.getCodigo() == null) {
 			throw new ValidacaoBancoDadosExcecao("Não foi possível salvar o responsável do estabelecimento"); 
 		}
 		
-		if(estabelecimento.getResponsavel().isNovo()) {			
-			estabelecimento.setResponsavel(pessoaSalva);
+		if(estabelecimento.getResponsavel().isNovo()) {
+			estabelecimento.setResponsavel(usuarioSalvo);
 		}
 					
 		estabelecimentosRepositorio.save(estabelecimento);

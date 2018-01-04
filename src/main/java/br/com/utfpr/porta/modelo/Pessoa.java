@@ -2,6 +2,7 @@ package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -63,6 +64,23 @@ public class Pessoa implements Serializable {
 	@Column(name = "data_nascimento")
 	@JsonSerialize(using = LocalDateSerializador.class)
 	private LocalDate dataNascimento;
+	
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
+	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	@PreUpdate
+	private void preUpdate() {
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
 	
 	@PrePersist
 	@PreUpdate

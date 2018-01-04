@@ -23,7 +23,9 @@ public @interface AtributoConfirmacao {
 	Class<?>[] groups() default {};
 	Class<? extends Payload>[] payload() default {};
 	
-	String atributo();
+	String atributoSite();	
+	String atributoConfirmacaoSite();
 	
-	String atributoConfirmacao();
+	String atributoTeclado();
+	String atributoConfirmacaoTeclado();
 }

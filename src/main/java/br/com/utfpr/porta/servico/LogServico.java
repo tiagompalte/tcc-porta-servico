@@ -24,7 +24,7 @@ public class LogServico {
 		log.setDataHora(dataHora);
 		log.setAcao(String.format(Acao.ENTRAR_PORTA.getDescricao(), usuario.getCodigoNome(), 
 				porta.getCodigoDescricao(), tipoAutenticacao));
-		log.setEstabelecimento(usuario.getEstabelecimento());
+		log.setEstabelecimento(porta.getEstabelecimento());
 		logRepositorio.save(log);
 	}
 }

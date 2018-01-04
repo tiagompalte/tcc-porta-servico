@@ -1,6 +1,7 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -29,9 +32,23 @@ public class Grupo implements Serializable {
 	@JoinTable(name = "grupo_permissao", joinColumns = @JoinColumn(name = "codigo_grupo"), inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
 	private List<Permissao> permissoes;
 	
-	@Column(name = "visivel_pagina")
-	private Boolean visivelPagina;
-
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
+	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	@PreUpdate
+	private void preUpdate() {
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -54,14 +71,6 @@ public class Grupo implements Serializable {
 
 	public void setPermissoes(List<Permissao> permissoes) {
 		this.permissoes = permissoes;
-	}
-	
-	public Boolean getVisivelPagina() {
-		return visivelPagina;
-	}
-
-	public void setVisivelPagina(Boolean visivelPagina) {
-		this.visivelPagina = visivelPagina;
 	}
 
 	@Override

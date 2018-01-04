@@ -1,11 +1,15 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 @Entity
@@ -19,6 +23,23 @@ public class Permissao implements Serializable {
 	private Long codigo;
 	
 	private String nome;
+	
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
+	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	@PreUpdate
+	private void preUpdate() {
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
 
 	public Long getCodigo() {
 		return codigo;
@@ -35,7 +56,7 @@ public class Permissao implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

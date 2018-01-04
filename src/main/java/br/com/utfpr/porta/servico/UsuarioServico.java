@@ -45,14 +45,10 @@ public class UsuarioServico {
 			throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 		}
 		
-		if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenha())) {
+		if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenhaSite())) {
 			throw new SenhaObrigatoriaUsuarioExcecao("Senha é obrigatória para novo usuário");
 		}
-		
-		if(usuario.getEstabelecimento() == null) {
-			throw new NullPointerException("Dados do estabelecimento não informado");
-		}
-				
+								
 		if(usuario.getPessoa() == null) {
 			throw new NullPointerException("Dados pessoais não informado");
 		}

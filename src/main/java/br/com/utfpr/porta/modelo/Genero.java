@@ -3,7 +3,8 @@ package br.com.utfpr.porta.modelo;
 public enum Genero {
 	
 	MASCULINO("Masculino"),
-	FEMININO("Feminino");
+	FEMININO("Feminino"),
+	OUTRO("Outro");
 		
 	private String descricao;
 	

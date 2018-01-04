@@ -10,33 +10,53 @@ import br.com.utfpr.porta.validacao.AtributoConfirmacao;
 
 public class AtributoConfirmacaoValidator implements ConstraintValidator<AtributoConfirmacao, Object> {
 
-	private String atributo;
-	private String atributoConfirmacao;
+	private String atributoSite;
+	private String atributoConfirmacaoSite;
+	
+	private String atributoTeclado;
+	private String atributoConfirmacaoTeclado;
 	
 	public void initialize(AtributoConfirmacao constraintAnnotation) {
-		this.atributo = constraintAnnotation.atributo();
-		this.atributoConfirmacao = constraintAnnotation.atributoConfirmacao();
+		this.atributoSite = constraintAnnotation.atributoSite();
+		this.atributoConfirmacaoSite = constraintAnnotation.atributoConfirmacaoSite();
+		
+		this.atributoTeclado = constraintAnnotation.atributoTeclado();
+		this.atributoConfirmacaoTeclado = constraintAnnotation.atributoConfirmacaoTeclado();
 	}
 
 	public boolean isValid(Object object, ConstraintValidatorContext context) {
-		boolean valido = false;
+		boolean validoSite = false;
+		boolean validoTeclado = false;
 		try {
-			Object valorAtributo = BeanUtils.getProperty(object, this.atributo);
-			Object valorAtributoConfirmacao = BeanUtils.getProperty(object, this.atributoConfirmacao);
+			Object valorAtributoSite = BeanUtils.getProperty(object, this.atributoSite);
+			Object valorAtributoConfirmacaoSite = BeanUtils.getProperty(object, this.atributoConfirmacaoSite);
 			
-			valido = ambosSaoNull(valorAtributo, valorAtributoConfirmacao) || ambosSaoIguais(valorAtributo, valorAtributoConfirmacao);
+			Object valorAtributoTeclado = BeanUtils.getProperty(object, this.atributoTeclado);
+			Object valorAtributoConfirmacaoTeclado = BeanUtils.getProperty(object, this.atributoConfirmacaoTeclado);
+			
+			validoSite = ambosSaoNull(valorAtributoSite, valorAtributoConfirmacaoSite) || ambosSaoIguais(valorAtributoSite, valorAtributoConfirmacaoSite);
+			
+			validoTeclado = ambosSaoNull(valorAtributoTeclado, valorAtributoConfirmacaoTeclado) || ambosSaoIguais(valorAtributoTeclado, valorAtributoConfirmacaoTeclado);
+			
 		} catch (Exception e) {
 			throw new RuntimeException("Erro recuperando valores dos atributos", e);
 		}
 		
-		if (!valido) {
+		if (!validoSite || !validoTeclado) {
 			context.disableDefaultConstraintViolation();
 			String mensagem = context.getDefaultConstraintMessageTemplate();
 			ConstraintViolationBuilder violationBuilder = context.buildConstraintViolationWithTemplate(mensagem);
-			violationBuilder.addPropertyNode(atributoConfirmacao).addConstraintViolation();
+			
+			if(!validoSite) {
+				violationBuilder.addPropertyNode(atributoConfirmacaoSite).addConstraintViolation();
+			}
+			if(!validoTeclado) {
+				violationBuilder.addPropertyNode(atributoConfirmacaoTeclado).addConstraintViolation();
+			}
+			
 		}
 		
-		return valido;
+		return validoSite;
 	}
 
 	private boolean ambosSaoIguais(Object valorAtributo, Object valorAtributoConfirmacao) {

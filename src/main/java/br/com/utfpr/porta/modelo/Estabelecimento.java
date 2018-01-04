@@ -1,13 +1,17 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.Valid;
@@ -35,13 +39,32 @@ public class Estabelecimento implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "codigo_responsavel")
 	@Valid
-	private Pessoa responsavel;
+	private Usuario responsavel;
+	
+	private Boolean ativo;
+	
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
 	
 	@Transient
 	private Long quantidadeUsuarios;
 	
 	@Transient
 	private Long quantidadePortas;
+	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	@PreUpdate
+	private void preUpdate() {
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
 	
 	public boolean isNovo() {
 		return codigo == null;
@@ -75,14 +98,22 @@ public class Estabelecimento implements Serializable {
 		this.endereco = endereco;
 	}
 
-	public Pessoa getResponsavel() {
+	public Usuario getResponsavel() {
 		return responsavel;
 	}
 
-	public void setResponsavel(Pessoa responsavel) {
+	public void setResponsavel(Usuario responsavel) {
 		this.responsavel = responsavel;
 	}
 	
+	public Boolean getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
+	}
+
 	public Long getQuantidadeUsuarios() {
 		return quantidadeUsuarios;
 	}

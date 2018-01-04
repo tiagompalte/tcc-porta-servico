@@ -1,11 +1,15 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -37,6 +41,23 @@ public class Endereco implements Serializable {
 	
 	@NotBlank(message = "Estado é obrigatório")
 	private String estado;
+	
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
+	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	@PreUpdate
+	private void preUpdate() {
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
 	
 	public boolean isNovo() {
 		return codigo == null;

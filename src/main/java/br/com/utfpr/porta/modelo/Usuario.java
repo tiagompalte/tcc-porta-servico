@@ -1,6 +1,7 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -12,11 +13,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
@@ -28,7 +30,9 @@ import br.com.utfpr.porta.validacao.AtributoConfirmacao;
 
 @Entity
 @Table(name = "usuario")
-@AtributoConfirmacao(atributo = "senha", atributoConfirmacao = "confirmacaoSenha", message = "Confirmação da senha não confere")
+@AtributoConfirmacao(atributoSite = "senhaSite", atributoConfirmacaoSite = "confirmacaoSenhaSite", 
+						atributoTeclado = "senhaTeclado", atributoConfirmacaoTeclado = "confirmacaoSenhaTeclado", 
+						message = "Confirmação da senha não confere")
 public class Usuario implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -37,11 +41,6 @@ public class Usuario implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
-
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "codigo_estabelecimento")
-	private Estabelecimento estabelecimento;
 	
 	@JsonIgnore
 	@ManyToOne
@@ -58,37 +57,64 @@ public class Usuario implements Serializable {
 	private Boolean ativo;
 	
 	@JsonIgnore
-	private String senha;
+	@Column(name = "senha_site")
+	private String senhaSite;
 	
 	@JsonIgnore
 	@Transient
-	private String confirmacaoSenha;
+	private String confirmacaoSenhaSite;
+	
+	@JsonIgnore
+	@Column(name = "senha_teclado")
+	private String senhaTeclado;
+	
+	@JsonIgnore
+	@Transient
+	private String confirmacaoSenhaTeclado;
 
 	@JsonIgnore
-	@Size(min = 1, message = "Selecione pelo menos um grupo")
 	@ManyToMany
-	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "codigo_usuario")
-				, inverseJoinColumns = @JoinColumn(name = "codigo_grupo"))	
+	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "codigo_usuario"), 
+				inverseJoinColumns = @JoinColumn(name = "codigo_grupo"))	
 	private List<Grupo> grupos;
+	
+	@JsonIgnore
+	@OneToOne
+	@JoinTable(name = "estabelecimento", joinColumns = @JoinColumn(name = "codigo_responsavel"),
+				inverseJoinColumns = @JoinColumn(name = "codigo"))
+	private Estabelecimento estabelecimento;
 		
 	@JsonIgnore
 	private String rfid;
-		
-	@Transient
-	private String audio;
-	
+			
 	@JsonIgnore
 	@Column(name = "nome_audio")
 	private String nomeAudio;
+	
+	@JsonIgnore
+	@Column(name = "data_hora_criacao")
+	private LocalDateTime dataHoraCriacao;
+	
+	@JsonIgnore
+	@Column(name = "data_hora_alteracao")
+	private LocalDateTime dataHoraAlteracao;
 	
 	public Usuario() {
 		pessoa = new Pessoa();
 		pessoa.setTipoPessoa(TipoPessoa.FISICA);
 	}
 	
+	@PrePersist
+	private void prePersist() {
+		this.dataHoraCriacao = LocalDateTime.now();
+		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
 	@PreUpdate
 	private void preUpdate() {
-		this.confirmacaoSenha = senha;
+		this.dataHoraAlteracao = LocalDateTime.now();
+		this.confirmacaoSenhaSite = senhaSite;
+		this.confirmacaoSenhaTeclado = senhaTeclado;
 	}
 	
 	@JsonInclude
@@ -125,22 +151,38 @@ public class Usuario implements Serializable {
 		this.ativo = ativo;
 	}
 
-	public String getSenha() {
-		return senha;
+	public String getSenhaSite() {
+		return senhaSite;
 	}
 
-	public void setSenha(String senha) {
-		this.senha = senha;
+	public void setSenhaSite(String senhaSite) {
+		this.senhaSite = senhaSite;
 	}
 	
-	public String getConfirmacaoSenha() {
-		return confirmacaoSenha;
+	public String getConfirmacaoSenhaSite() {
+		return confirmacaoSenhaSite;
 	}
 
-	public void setConfirmacaoSenha(String confirmacaoSenha) {
-		this.confirmacaoSenha = confirmacaoSenha;
+	public void setConfirmacaoSenhaSite(String confirmacaoSenhaSite) {
+		this.confirmacaoSenhaSite = confirmacaoSenhaSite;
 	}
-		
+			
+	public String getSenhaTeclado() {
+		return senhaTeclado;
+	}
+
+	public void setSenhaTeclado(String senhaTeclado) {
+		this.senhaTeclado = senhaTeclado;
+	}
+
+	public String getConfirmacaoSenhaTeclado() {
+		return confirmacaoSenhaTeclado;
+	}
+
+	public void setConfirmacaoSenhaTeclado(String confirmacaoSenhaTeclado) {
+		this.confirmacaoSenhaTeclado = confirmacaoSenhaTeclado;
+	}
+
 	public List<Grupo> getGrupos() {
 		return grupos;
 	}
@@ -156,14 +198,6 @@ public class Usuario implements Serializable {
 	public void setRfid(String rfid) {
 		this.rfid = rfid;
 	}
-
-	public String getAudio() {
-		return audio;
-	}
-	
-	public void setAudio(String audio) {
-		this.audio = audio;
-	}
 	
 	public String getNomeAudio() {
 		return nomeAudio;
@@ -173,20 +207,20 @@ public class Usuario implements Serializable {
 		this.nomeAudio = nomeAudio;
 	}
 	
-	public Estabelecimento getEstabelecimento() {
-		return estabelecimento;
-	}
-
-	public void setEstabelecimento(Estabelecimento estabelecimento) {
-		this.estabelecimento = estabelecimento;
-	}
-
 	public Pessoa getPessoa() {
 		return pessoa;
 	}
 
 	public void setPessoa(Pessoa pessoa) {
 		this.pessoa = pessoa;
+	}
+	
+	public Estabelecimento getEstabelecimento() {
+		return estabelecimento;
+	}
+
+	public void setEstabelecimento(Estabelecimento estabelecimento) {
+		this.estabelecimento = estabelecimento;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -13,15 +14,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotBlank;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
-@Table(name = "porta")
-public class Porta implements Serializable {
+@Table(name = "anuncio")
+public class Anuncio implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -33,13 +31,11 @@ public class Porta implements Serializable {
 	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 	
-	@NotBlank(message = "A descrição é obrigatória")
-	@Size(max = 50, message = "O tamanho da descrição deve estar entre 1 e 50")
+	@Size(min = 5, max = 200, message = "Descrição deve ter entre 5 e 200 caracteres")
 	private String descricao;
 	
-	@NotBlank(message = "A senha é obrigatória")
-	@Column(updatable = false)
-	private String senha;
+	@NotNull(message = "Informe um preço")
+	private BigDecimal preco;
 	
 	@Column(name = "data_hora_criacao")
 	private LocalDateTime dataHoraCriacao;
@@ -57,33 +53,21 @@ public class Porta implements Serializable {
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
 	}
-				
-	public String getCodigoDescricao() {
-		
-		String codigoDescricao = "";
-		
-		if(codigo != null) {
-			codigoDescricao = codigo.toString();
-		}
-		
-		if(descricao != null) {
-			codigoDescricao = codigoDescricao.isEmpty() ? descricao : codigoDescricao.concat(" - ").concat(descricao);
-		}
-		
-		return codigoDescricao;
-	}
-	
-	@JsonIgnore
-	public boolean isNovo() {
-		return codigo == null;
-	}
-		
+
 	public Long getCodigo() {
 		return codigo;
 	}
 
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
+	}
+
+	public Estabelecimento getEstabelecimento() {
+		return estabelecimento;
+	}
+
+	public void setEstabelecimento(Estabelecimento estabelecimento) {
+		this.estabelecimento = estabelecimento;
 	}
 
 	public String getDescricao() {
@@ -93,21 +77,13 @@ public class Porta implements Serializable {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	
-	public Estabelecimento getEstabelecimento() {
-		return estabelecimento;
+
+	public BigDecimal getPreco() {
+		return preco;
 	}
 
-	public void setEstabelecimento(Estabelecimento estabelecimento) {
-		this.estabelecimento = estabelecimento;
-	}
-	
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
+	public void setPreco(BigDecimal preco) {
+		this.preco = preco;
 	}
 
 	@Override
@@ -126,7 +102,7 @@ public class Porta implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Porta other = (Porta) obj;
+		Anuncio other = (Anuncio) obj;
 		if (codigo == null) {
 			if (other.codigo != null)
 				return false;

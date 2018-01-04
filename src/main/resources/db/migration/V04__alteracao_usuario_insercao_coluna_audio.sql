@@ -1,1 +1,0 @@
-ALTER TABLE usuario ADD COLUMN nome_audio VARCHAR(50);
