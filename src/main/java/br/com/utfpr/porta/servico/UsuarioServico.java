@@ -76,16 +76,16 @@ public class UsuarioServico {
 					throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
 				}
 				
-				if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-					throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-				}
+//				if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+//					throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+//				}
 				
 				if(usuario.getSenhaTeclado().length() != 4) {
 					throw new CampoNaoInformadoExcecao("senhaTeclado", "Senha da porta deve ter 4 dígitos");
 				}
 				
 				usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
-				usuario.setConfirmacaoSenhaTeclado(usuario.getConfirmacaoSenhaTeclado());
+				usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
 			}
 			else if(grupo.getCodigo().compareTo(Long.parseLong("2")) == 0) {
 				//anfitrião
