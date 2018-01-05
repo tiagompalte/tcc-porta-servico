@@ -15,7 +15,7 @@ import br.com.utfpr.porta.modelo.Porta;
 import br.com.utfpr.porta.modelo.TipoAutorizacao;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Autorizacoes;
-import br.com.utfpr.porta.servico.excecao.CampoNuloExcecao;
+import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
 import br.com.utfpr.porta.servico.excecao.HoraInicialPosteriorHoraFinalExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
@@ -33,21 +33,21 @@ public class AutorizacaoServico {
 			throw new ValidacaoBancoDadosExcecao("Usuário e porta não informados");
 		}
 		else if(autorizacao.getId().getUsuario() == null || autorizacao.getId().getUsuario().getCodigo() == null) {
-			throw new CampoNuloExcecao("id.usuario", "Usuário é obrigatório");
+			throw new CampoNaoInformadoExcecao("id.usuario", "Usuário é obrigatório");
 		}
 		else if(autorizacao.getId().getPorta() == null || autorizacao.getId().getPorta().getCodigo() == null) {
-			throw new CampoNuloExcecao("id.porta", "Porta é obrigatório");
+			throw new CampoNaoInformadoExcecao("id.porta", "Porta é obrigatório");
 		}
 		
 		if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.PROGRAMADO) == 0) {
 			if(autorizacao.getDiaSemana() == null) {
-				throw new CampoNuloExcecao("diaSemana", "Campo dia da semana é obrigatório");
+				throw new CampoNaoInformadoExcecao("diaSemana", "Campo dia da semana é obrigatório");
 			}
 			if(autorizacao.getHoraInicio() == null) {
-				throw new CampoNuloExcecao("horaInicio", "Campo hora de início é obrigatório");
+				throw new CampoNaoInformadoExcecao("horaInicio", "Campo hora de início é obrigatório");
 			}
 			if(autorizacao.getHoraFim() == null) {
-				throw new CampoNuloExcecao("horaFim", "Campo hora final é obrigatório");
+				throw new CampoNaoInformadoExcecao("horaFim", "Campo hora final é obrigatório");
 			}
 			if(autorizacao.getHoraInicio() != null && autorizacao.getHoraFim() != null
 					&& autorizacao.getHoraInicio().isAfter(autorizacao.getHoraFim())) {
@@ -59,13 +59,13 @@ public class AutorizacaoServico {
 		}
 		else if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.TEMPORARIO) == 0) {
 			if(autorizacao.getDataTemporaria() == null) {
-				throw new CampoNuloExcecao("dataTemporaria", "Campo data é obrigatório");
+				throw new CampoNaoInformadoExcecao("dataTemporaria", "Campo data é obrigatório");
 			}
 			if(autorizacao.getDataHoraInicio() == null) {
-				throw new CampoNuloExcecao("horaInicioTemporaria", "Campo hora de início é obrigatório");
+				throw new CampoNaoInformadoExcecao("horaInicioTemporaria", "Campo hora de início é obrigatório");
 			}
 			if(autorizacao.getDataHoraFim() == null) {
-				throw new CampoNuloExcecao("horaFimTemporaria", "Campo hora final é obrigatório");
+				throw new CampoNaoInformadoExcecao("horaFimTemporaria", "Campo hora final é obrigatório");
 			}
 			if(autorizacao.getDataHoraInicio() != null && autorizacao.getDataHoraFim() != null
 					&& autorizacao.getDataHoraInicio().isAfter(autorizacao.getDataHoraFim())) {

@@ -11,7 +11,7 @@ import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Enderecos;
 import br.com.utfpr.porta.repositorio.Estabelecimentos;
-import br.com.utfpr.porta.repositorio.Usuarios;
+import br.com.utfpr.porta.servico.excecao.EnderecoJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
@@ -25,7 +25,7 @@ public class EstabelecimentoServico {
 	private Enderecos enderecosRespositorio;
 	
 	@Autowired
-	private Usuarios usuariosRepositorio;
+	private UsuarioServico usuarioServico;
 	
 	@Transactional
 	public void salvar(Estabelecimento estabelecimento) {
@@ -36,6 +36,14 @@ public class EstabelecimentoServico {
 		
 		if(estabelecimento.getEndereco() == null) {
 			throw new NullPointerException("Endereço não informado");
+		}
+		
+		Endereco enderecoBase = enderecosRespositorio.findByCepAndNumero(
+				estabelecimento.getEndereco().getCep(), estabelecimento.getEndereco().getNumero());
+		
+		if(enderecoBase != null && estabelecimento.getEndereco().getComplemento() != null && enderecoBase.getComplemento() != null 
+				&& estabelecimento.getEndereco().getComplemento().compareTo(enderecoBase.getComplemento()) == 0) {
+			throw new EnderecoJaCadastradoExcecao("Endereço já cadastrado");
 		}
 		
 		if(estabelecimento.getResponsavel() == null) {
@@ -50,7 +58,7 @@ public class EstabelecimentoServico {
 		
 		estabelecimento.setEndereco(enderecoSalvo);
 		
-		Usuario usuarioSalvo = usuariosRepositorio.save(estabelecimento.getResponsavel());
+		Usuario usuarioSalvo = usuarioServico.salvar(estabelecimento.getResponsavel());
 		
 		if(usuarioSalvo == null || usuarioSalvo.getCodigo() == null) {
 			throw new ValidacaoBancoDadosExcecao("Não foi possível salvar o responsável do estabelecimento"); 
@@ -59,6 +67,8 @@ public class EstabelecimentoServico {
 		if(estabelecimento.getResponsavel().isNovo()) {
 			estabelecimento.setResponsavel(usuarioSalvo);
 		}
+		
+		estabelecimento.setAtivo(Boolean.TRUE);
 					
 		estabelecimentosRepositorio.save(estabelecimento);
 		

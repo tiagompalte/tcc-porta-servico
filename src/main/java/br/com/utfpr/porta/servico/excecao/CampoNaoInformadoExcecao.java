@@ -1,12 +1,12 @@
 package br.com.utfpr.porta.servico.excecao;
 
-public class CampoNuloExcecao extends RuntimeException {
+public class CampoNaoInformadoExcecao extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private String campo;
 	
-	public CampoNuloExcecao(String campo, String message) {		
+	public CampoNaoInformadoExcecao(String campo, String message) {		
 		super(message);
 		this.campo = campo;
 	}

@@ -112,8 +112,6 @@ CREATE TABLE permissao (
 CREATE TABLE usuario_grupo (
     codigo_usuario BIGINT(20) NOT NULL,
     codigo_grupo BIGINT(20) NOT NULL,
-    data_hora_criacao DATETIME NOT NULL,
-    data_hora_alteracao DATETIME NOT NULL,
     CONSTRAINT PK_usuario_grupo PRIMARY KEY (codigo_usuario, codigo_grupo),
     CONSTRAINT FK_usuario_grupo_usuario FOREIGN KEY (codigo_usuario) REFERENCES usuario(codigo),
     CONSTRAINT FK_usuario_grupo_grupo FOREIGN KEY (codigo_grupo) REFERENCES grupo(codigo)
@@ -122,8 +120,6 @@ CREATE TABLE usuario_grupo (
 CREATE TABLE grupo_permissao (
     codigo_grupo BIGINT(20) NOT NULL,
     codigo_permissao BIGINT(20) NOT NULL,
-    data_hora_criacao DATETIME NOT NULL,
-    data_hora_alteracao DATETIME NOT NULL,
     CONSTRAINT PK_grupo_permissao PRIMARY KEY (codigo_grupo, codigo_permissao),
     CONSTRAINT FK_grupo_permissao_grupo FOREIGN KEY (codigo_grupo) REFERENCES grupo(codigo),
     CONSTRAINT FK_grupo_permissao_permissao FOREIGN KEY (codigo_permissao) REFERENCES permissao(codigo)

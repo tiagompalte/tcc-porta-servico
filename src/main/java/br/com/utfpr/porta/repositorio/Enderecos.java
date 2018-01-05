@@ -7,5 +7,7 @@ import br.com.utfpr.porta.modelo.Endereco;
 
 @Repository
 public interface Enderecos extends JpaRepository<Endereco, Long> {
+	
+	public Endereco findByCepAndNumero(String cep, String numero);
 
 }

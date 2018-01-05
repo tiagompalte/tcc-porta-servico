@@ -56,7 +56,7 @@ public class AtributoConfirmacaoValidator implements ConstraintValidator<Atribut
 			
 		}
 		
-		return validoSite;
+		return (validoSite && validoTeclado);
 	}
 
 	private boolean ambosSaoIguais(Object valorAtributo, Object valorAtributoConfirmacao) {

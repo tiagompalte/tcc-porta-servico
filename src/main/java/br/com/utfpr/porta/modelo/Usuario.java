@@ -98,12 +98,7 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
-	
-	public Usuario() {
-		pessoa = new Pessoa();
-		pessoa.setTipoPessoa(TipoPessoa.FISICA);
-	}
-	
+		
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
@@ -117,6 +112,11 @@ public class Usuario implements Serializable {
 		this.confirmacaoSenhaTeclado = senhaTeclado;
 	}
 	
+	public Usuario() {
+		this.pessoa = new Pessoa();
+		this.pessoa.setTipoPessoa(TipoPessoa.FISICA);
+	}
+	
 	@JsonInclude
 	public String getCodigoNome() {
 		return codigo.toString().concat(" - ").concat(pessoa.getNome());
@@ -126,7 +126,7 @@ public class Usuario implements Serializable {
 	public boolean isNovo() {
 		return codigo == null;
 	}
-
+	
 	public Long getCodigo() {
 		return codigo;
 	}
