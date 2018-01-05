@@ -75,19 +75,15 @@ public class Pessoa implements Serializable {
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
 		this.dataHoraAlteracao = LocalDateTime.now();
+		this.cpfOuCnpj = TipoPessoa.removerFormatacao(this.cpfOuCnpj);
 	}
 	
 	@PreUpdate
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
-	}
-	
-	@PrePersist
-	@PreUpdate
-	private void prePersistPreUpdate() {
 		this.cpfOuCnpj = TipoPessoa.removerFormatacao(this.cpfOuCnpj);
 	}
-	
+		
 	@PostLoad
 	private void postLoad() {
 		this.cpfOuCnpj = this.tipoPessoa.formatar(this.cpfOuCnpj);
