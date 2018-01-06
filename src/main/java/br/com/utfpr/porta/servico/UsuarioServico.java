@@ -76,9 +76,9 @@ public class UsuarioServico {
 					throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
 				}
 				
-//				if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-//					throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-//				}
+				if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+					throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+				}
 				
 				if(usuario.getSenhaTeclado().length() != 4) {
 					throw new CampoNaoInformadoExcecao("senhaTeclado", "Senha da porta deve ter 4 dígitos");
@@ -105,7 +105,8 @@ public class UsuarioServico {
 		}
 		
 		if(usuario.isNovo()) {
-			usuario.setPessoa(pessoaSalva);			
+			usuario.setPessoa(pessoaSalva);	
+			usuario.setAtivo(Boolean.TRUE);
 		}
 		
 		return usuariosRepositorio.save(usuario);

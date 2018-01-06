@@ -68,8 +68,10 @@ public class EstabelecimentoServico {
 			estabelecimento.setResponsavel(usuarioSalvo);
 		}
 		
-		estabelecimento.setAtivo(Boolean.TRUE);
-					
+		if(estabelecimento.isNovo()) {			
+			estabelecimento.setAtivo(Boolean.TRUE);
+		}
+							
 		estabelecimentosRepositorio.save(estabelecimento);
 		
 	}
