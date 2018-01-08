@@ -43,14 +43,14 @@ public class Estabelecimento implements Serializable {
 	
 	private Boolean ativo;
 	
-	@Column(name = "data_hora_criacao")
+	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
 	
-	@Transient
-	private Long quantidadeUsuarios;
+//	@Transient
+//	private Long quantidadeUsuarios;
 	
 	@Transient
 	private Long quantidadePortas;
@@ -114,13 +114,13 @@ public class Estabelecimento implements Serializable {
 		this.ativo = ativo;
 	}
 
-	public Long getQuantidadeUsuarios() {
-		return quantidadeUsuarios;
-	}
-
-	public void setQuantidadeUsuarios(Long quantidadeUsuarios) {
-		this.quantidadeUsuarios = quantidadeUsuarios;
-	}
+//	public Long getQuantidadeUsuarios() {
+//		return quantidadeUsuarios;
+//	}
+//
+//	public void setQuantidadeUsuarios(Long quantidadeUsuarios) {
+//		this.quantidadeUsuarios = quantidadeUsuarios;
+//	}
 
 	public Long getQuantidadePortas() {
 		return quantidadePortas;

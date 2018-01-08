@@ -65,7 +65,7 @@ public class Pessoa implements Serializable {
 	@JsonSerialize(using = LocalDateSerializador.class)
 	private LocalDate dataNascimento;
 	
-	@Column(name = "data_hora_criacao")
+	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
 	@Column(name = "data_hora_alteracao")

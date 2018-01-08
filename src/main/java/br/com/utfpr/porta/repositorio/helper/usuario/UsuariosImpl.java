@@ -74,9 +74,9 @@ public class UsuariosImpl implements UsuariosQueries {
 				criteria.add(Restrictions.ilike("email", filtro.getEmail(), MatchMode.START));
 			}
 			
-			if(filtro.getEstabelecimento() != null && !StringUtils.isEmpty(filtro.getEstabelecimento().getCodigo())) {
-				criteria.add(Restrictions.eq("estabelecimento", filtro.getEstabelecimento()));
-			}			
+//			if(filtro.getEstabelecimento() != null && !StringUtils.isEmpty(filtro.getEstabelecimento().getCodigo())) {
+//				criteria.add(Restrictions.eq("estabelecimento", filtro.getEstabelecimento()));
+//			}			
 		}
 	}
 
@@ -89,14 +89,14 @@ public class UsuariosImpl implements UsuariosQueries {
 		return (Usuario) criteria.uniqueResult();
 	}
 
-	@Transactional(readOnly = true)
-	public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento) {
-		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
-		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
-		criteria.add(Restrictions.eq("codigo", codigo));
-		criteria.add(Restrictions.eq("estabelecimento.codigo", estabelecimento.getCodigo()));
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return (Usuario) criteria.uniqueResult();
-	}
+//	@Transactional(readOnly = true)
+//	public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento) {
+//		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+//		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
+//		criteria.add(Restrictions.eq("codigo", codigo));
+//		criteria.add(Restrictions.eq("estabelecimento.codigo", estabelecimento.getCodigo()));
+//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+//		return (Usuario) criteria.uniqueResult();
+//	}
 	
 }

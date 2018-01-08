@@ -92,7 +92,7 @@ public class Usuario implements Serializable {
 	private String nomeAudio;
 	
 	@JsonIgnore
-	@Column(name = "data_hora_criacao")
+	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
 	@JsonIgnore
@@ -119,7 +119,10 @@ public class Usuario implements Serializable {
 	
 	@JsonInclude
 	public String getCodigoNome() {
-		return codigo.toString().concat(" - ").concat(pessoa.getNome());
+		if(pessoa == null) {			
+			return codigo.toString();
+		}
+		return codigo.toString().concat(" - ").concat(pessoa.getNome()); 
 	}
 		
 	@JsonIgnore

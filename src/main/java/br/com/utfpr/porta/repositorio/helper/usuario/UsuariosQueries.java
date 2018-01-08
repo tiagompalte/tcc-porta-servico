@@ -20,6 +20,6 @@ public interface UsuariosQueries {
 	
 	public Usuario buscarComGrupos(Long codigo);
 	
-	public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento);
+	//public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento);
 	
 }

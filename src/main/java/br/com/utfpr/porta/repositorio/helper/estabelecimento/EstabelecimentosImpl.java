@@ -39,7 +39,7 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		
 		if(filtrados != null && filtrados.isEmpty() == false) {
 			for(Estabelecimento est : filtrados) {
-				est.setQuantidadeUsuarios(quantidadeUsuariosPorEstabelecimento(est.getCodigo()));
+				//est.setQuantidadeUsuarios(quantidadeUsuariosPorEstabelecimento(est.getCodigo()));
 				est.setQuantidadePortas(quantidadePortasPorEstabelecimento(est.getCodigo()));
 			}
 		}
@@ -66,12 +66,12 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		}
 	}
 	
-	private Long quantidadeUsuariosPorEstabelecimento(Long codigo_estabelecimento) {
-		return manager
-				.createQuery("select count(*) from Usuario where codigo_estabelecimento = :codigo", Long.class)
-				.setParameter("codigo", codigo_estabelecimento)
-				.getSingleResult();
-	}
+//	private Long quantidadeUsuariosPorEstabelecimento(Long codigo_estabelecimento) {
+//		return manager
+//				.createQuery("select count(*) from Usuario where codigo_estabelecimento = :codigo", Long.class)
+//				.setParameter("codigo", codigo_estabelecimento)
+//				.getSingleResult();
+//	}
 	
 	private Long quantidadePortasPorEstabelecimento(Long codigo_estabelecimento) {
 		return manager

@@ -44,56 +44,78 @@ public class UsuarioServico {
 		if (usuarioExistente.isPresent() && !usuarioExistente.get().equals(usuario)) {
 			throw new EmailUsuarioJaCadastradoExcecao("E-mail já cadastrado");
 		}
-				
-		if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenhaSite())) {
-			throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
-		}
 		
-		if(usuario.getSenhaSite().length() < 6 || usuario.getSenhaSite().length() > 12) {
-			throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site deve ter entre 6 e 12 caracteres");
-		}
-		
-		usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
-		usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());
-		
-		usuario.setAtivo(Boolean.TRUE);
-		
-		for(Grupo grupo : usuario.getGrupos()) {	
-			
-			if(grupo.getCodigo().compareTo(Long.parseLong("3")) == 0) {
-				//usuário
-				
-				if(StringUtils.isEmpty(usuario.getRfid())) {
-					throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
+		if(StringUtils.isEmpty(usuario.getSenhaSite())) {
+			if (usuario.isNovo()) {
+				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
+			}
+			else {
+				Usuario usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
+				if(usuarioBase != null) {
+					usuario.setSenhaSite(usuarioBase.getSenhaSite());
+					usuario.setConfirmacaoSenhaSite(usuarioBase.getSenhaSite());					
 				}
+			}			
+		}
+		else {			
+			if(usuario.getSenhaSite().length() < 6 || usuario.getSenhaSite().length() > 12) {
+				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site deve ter entre 6 e 12 caracteres");
+			}
+			usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
+			usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());			
+		}
+		
+		if(usuario.getGrupos() != null) {			
+			for(Grupo grupo : usuario.getGrupos()) {	
+				
+				if(grupo.getCodigo().compareTo(Long.parseLong("3")) == 0) {
+					//usuário
 					
-				Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
-				if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
-					throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+					if(StringUtils.isEmpty(usuario.getRfid())) {
+						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
+					}
+					
+					Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
+					if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
+						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+					}
+					
+					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+					}
+					
+					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
+						if (usuario.isNovo()) {
+							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
+						}
+						else {
+							Usuario usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
+							if(usuarioBase != null) {							
+								usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
+								usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());
+							}
+						}
+					}
+					else {					
+						if(usuario.getSenhaTeclado().length() != 4) {
+							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta deve ter 4 dígitos");
+						}
+						usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
+						usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
+					}
+					
 				}
-				
-				if (usuario.isNovo() && StringUtils.isEmpty(usuario.getSenhaTeclado())) {
-					throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
+				else if(grupo.getCodigo().compareTo(Long.parseLong("2")) == 0) {
+					//anfitrião
+					usuario.setSenhaTeclado("");
+					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
 				}
-				
-				if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-					throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-				}
-				
-				if(usuario.getSenhaTeclado().length() != 4) {
-					throw new CampoNaoInformadoExcecao("senhaTeclado", "Senha da porta deve ter 4 dígitos");
-				}
-				
-				usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
-				usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
-			}
-			else if(grupo.getCodigo().compareTo(Long.parseLong("2")) == 0) {
-				//anfitrião
-				usuario.setSenhaTeclado("");
-				usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
 			}
 		}
-								
+		else {
+			throw new NullPointerException("Grupo do usuário não informado");
+		}
+										
 		if(usuario.getPessoa() == null) {
 			throw new NullPointerException("Dados pessoais não informado");
 		}

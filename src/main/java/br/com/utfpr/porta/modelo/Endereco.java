@@ -42,7 +42,7 @@ public class Endereco implements Serializable {
 	@NotBlank(message = "Estado é obrigatório")
 	private String estado;
 	
-	@Column(name = "data_hora_criacao")
+	@Column(name = "data_hora_criacao", updatable=false)	
 	private LocalDateTime dataHoraCriacao;
 	
 	@Column(name = "data_hora_alteracao")

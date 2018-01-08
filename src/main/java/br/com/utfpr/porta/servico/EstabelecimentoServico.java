@@ -38,14 +38,16 @@ public class EstabelecimentoServico {
 			throw new NullPointerException("Endereço não informado");
 		}
 		
-		Endereco enderecoBase = enderecosRespositorio.findByCepAndNumero(
-				estabelecimento.getEndereco().getCep(), estabelecimento.getEndereco().getNumero());
-		
-		if(enderecoBase != null && estabelecimento.getEndereco().getComplemento() != null && enderecoBase.getComplemento() != null 
-				&& estabelecimento.getEndereco().getComplemento().compareTo(enderecoBase.getComplemento()) == 0) {
-			throw new EnderecoJaCadastradoExcecao("Endereço já cadastrado");
+		if(estabelecimento.isNovo()) {			
+			Endereco enderecoBase = enderecosRespositorio.findByCepAndNumero(
+					estabelecimento.getEndereco().getCep(), estabelecimento.getEndereco().getNumero());
+			
+			if(enderecoBase != null && estabelecimento.getEndereco().getComplemento() != null && enderecoBase.getComplemento() != null 
+					&& estabelecimento.getEndereco().getComplemento().compareTo(enderecoBase.getComplemento()) == 0) {
+				throw new EnderecoJaCadastradoExcecao("Endereço já cadastrado");
+			}
 		}
-		
+				
 		if(estabelecimento.getResponsavel() == null) {
 			throw new NullPointerException("Responsável não informado");
 		}
