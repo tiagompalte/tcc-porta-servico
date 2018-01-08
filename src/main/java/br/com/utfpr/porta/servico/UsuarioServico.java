@@ -71,18 +71,22 @@ public class UsuarioServico {
 				if(grupo.getCodigo().compareTo(Long.parseLong("3")) == 0) {
 					//usuário
 					
+					usuario.setEstabelecimento(null);
+					
 					if(StringUtils.isEmpty(usuario.getRfid())) {
 						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
 					}
 					
-					Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
-					if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
-						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+					if(usuario.isNovo()) {						
+						Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
+						if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
+							throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+						}
 					}
 					
-					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-					}
+//					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+//						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+//					}
 					
 					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
 						if (usuario.isNovo()) {
@@ -108,7 +112,7 @@ public class UsuarioServico {
 				else if(grupo.getCodigo().compareTo(Long.parseLong("2")) == 0) {
 					//anfitrião
 					usuario.setSenhaTeclado("");
-					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
+					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());					
 				}
 			}
 		}

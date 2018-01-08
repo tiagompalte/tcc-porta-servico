@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.filtro.UsuarioFiltro;
 
@@ -19,7 +18,5 @@ public interface UsuariosQueries {
 	public List<String> permissoes(Usuario usuario);
 	
 	public Usuario buscarComGrupos(Long codigo);
-	
-	//public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento);
 	
 }

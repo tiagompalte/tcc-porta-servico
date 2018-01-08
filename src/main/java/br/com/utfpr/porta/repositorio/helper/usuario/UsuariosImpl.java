@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.filtro.UsuarioFiltro;
 import br.com.utfpr.porta.repositorio.paginacao.PaginacaoUtil;
@@ -73,10 +72,7 @@ public class UsuariosImpl implements UsuariosQueries {
 			if (!StringUtils.isEmpty(filtro.getEmail())) {
 				criteria.add(Restrictions.ilike("email", filtro.getEmail(), MatchMode.START));
 			}
-			
-//			if(filtro.getEstabelecimento() != null && !StringUtils.isEmpty(filtro.getEstabelecimento().getCodigo())) {
-//				criteria.add(Restrictions.eq("estabelecimento", filtro.getEstabelecimento()));
-//			}			
+					
 		}
 	}
 
@@ -88,15 +84,5 @@ public class UsuariosImpl implements UsuariosQueries {
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return (Usuario) criteria.uniqueResult();
 	}
-
-//	@Transactional(readOnly = true)
-//	public Usuario buscarComGruposEstabelecimento(Long codigo, Estabelecimento estabelecimento) {
-//		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
-//		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
-//		criteria.add(Restrictions.eq("codigo", codigo));
-//		criteria.add(Restrictions.eq("estabelecimento.codigo", estabelecimento.getCodigo()));
-//		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-//		return (Usuario) criteria.uniqueResult();
-//	}
 	
 }

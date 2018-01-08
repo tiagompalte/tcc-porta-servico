@@ -114,7 +114,7 @@ public class Usuario implements Serializable {
 	
 	public Usuario() {
 		this.pessoa = new Pessoa();
-		this.pessoa.setTipoPessoa(TipoPessoa.FISICA);
+		this.pessoa.setTipoPessoa(TipoPessoa.FISICA);		
 	}
 	
 	@JsonInclude
