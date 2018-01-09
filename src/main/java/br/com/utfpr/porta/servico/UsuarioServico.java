@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Grupo;
+import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.modelo.Pessoa;
 import br.com.utfpr.porta.modelo.Usuario;
+import br.com.utfpr.porta.repositorio.Parametros;
 import br.com.utfpr.porta.repositorio.Pessoas;
 import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
@@ -32,6 +34,9 @@ public class UsuarioServico {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private Parametros parametroRepositorio;
 	
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
@@ -65,10 +70,22 @@ public class UsuarioServico {
 			usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());			
 		}
 		
-		if(usuario.getGrupos() != null) {			
+		if(usuario.getGrupos() != null) {		
+			
+			Parametro par_cod_grp_anfitricao = parametroRepositorio.findOne("COD_GRP_ANFITRIAO");
+			Parametro par_cod_grp_usuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
+			
+			if(par_cod_grp_usuario == null) {
+				throw new NullPointerException("COD_GRP_USUARIO não parametrizado");
+			}
+			
+			if(par_cod_grp_anfitricao == null){
+				throw new NullPointerException("COD_GRP_ANFITRIAO não parametrizado");
+			}
+			
 			for(Grupo grupo : usuario.getGrupos()) {	
 				
-				if(grupo.getCodigo().compareTo(Long.parseLong("3")) == 0) {
+				if(grupo.getCodigo().compareTo(par_cod_grp_usuario.getValorLong()) == 0) {
 					//usuário
 					
 					usuario.setEstabelecimento(null);
@@ -84,9 +101,9 @@ public class UsuarioServico {
 						}
 					}
 					
-//					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-//						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-//					}
+					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+					}
 					
 					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
 						if (usuario.isNovo()) {
@@ -109,10 +126,10 @@ public class UsuarioServico {
 					}
 					
 				}
-				else if(grupo.getCodigo().compareTo(Long.parseLong("2")) == 0) {
+				else if(grupo.getCodigo().compareTo(par_cod_grp_anfitricao.getValorLong()) == 0) {
 					//anfitrião
 					usuario.setSenhaTeclado("");
-					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());					
+					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
 				}
 			}
 		}

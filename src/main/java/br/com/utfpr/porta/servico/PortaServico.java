@@ -7,11 +7,14 @@ import javax.persistence.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Autorizacao;
 import br.com.utfpr.porta.modelo.Estabelecimento;
+import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.modelo.Porta;
 import br.com.utfpr.porta.repositorio.Autorizacoes;
+import br.com.utfpr.porta.repositorio.Parametros;
 import br.com.utfpr.porta.repositorio.Portas;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 
@@ -23,12 +26,27 @@ public class PortaServico {
 	
 	@Autowired
 	private Autorizacoes autorizacoesRepositorio;
+	
+	@Autowired
+	private Parametros parametrosRepositorio;
 			
 	@Transactional
 	public void salvar(Porta porta) {
 		
 		if(porta == null) {
 			throw new NullPointerException("Porta não informada");
+		}
+		
+		if(porta.getEstabelecimento() == null) {
+			Parametro par_cod_est_sistema = parametrosRepositorio.findOne("COD_EST_SISTEMA");
+			
+			if(par_cod_est_sistema == null || StringUtils.isEmpty(par_cod_est_sistema.getValor())) {
+				throw new NullPointerException("COD_EST_SISTEMA não parametrizado");
+			}
+			
+			Estabelecimento estabelecimento = new Estabelecimento();
+			estabelecimento.setCodigo(par_cod_est_sistema.getValorLong());
+			porta.setEstabelecimento(estabelecimento);
 		}
 						
 		portasRepositorio.save(porta);

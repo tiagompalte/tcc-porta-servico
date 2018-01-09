@@ -5,48 +5,37 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mysql.jdbc.StringUtils;
 
 @Entity
-@Table(name = "porta")
-public class Porta implements Serializable {
+@Table(name = "parametro")
+public class Parametro implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long codigo;
+	@NotBlank(message ="Código do parâmetro deve ser informado")
+	private String codigo;
 	
-	@ManyToOne
-	@JoinColumn(name = "codigo_estabelecimento")
-	private Estabelecimento estabelecimento;
-	
-	@NotBlank(message = "A descrição é obrigatória")
-	@Size(max = 50, message = "O tamanho da descrição deve estar entre 1 e 50")
 	private String descricao;
 	
-	@NotBlank(message = "A senha é obrigatória")
-	@Column(updatable = false)
-	private String senha;
+	@NotBlank(message ="Valor do parâmetro deve ser informado")
+	private String valor;
 	
 	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
-	
+		
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
@@ -57,32 +46,19 @@ public class Porta implements Serializable {
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
 	}
-				
-	public String getCodigoDescricao() {
-		
-		String codigoDescricao = "";
-		
-		if(codigo != null) {
-			codigoDescricao = codigo.toString();
-		}
-		
-		if(descricao != null) {
-			codigoDescricao = codigoDescricao.isEmpty() ? descricao : codigoDescricao.concat(" - ").concat(descricao);
-		}
-		
-		return codigoDescricao;
-	}
 	
-	@JsonIgnore
 	public boolean isNovo() {
 		return codigo == null;
 	}
-		
-	public Long getCodigo() {
+
+	public String getCodigo() {
 		return codigo;
 	}
 
-	public void setCodigo(Long codigo) {
+	public void setCodigo(String codigo) {
+		if(codigo != null) {
+			this.codigo = codigo.toUpperCase();
+		}
 		this.codigo = codigo;
 	}
 
@@ -93,21 +69,21 @@ public class Porta implements Serializable {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-	
-	public Estabelecimento getEstabelecimento() {
-		return estabelecimento;
+
+	public String getValor() {
+		return valor;
 	}
 
-	public void setEstabelecimento(Estabelecimento estabelecimento) {
-		this.estabelecimento = estabelecimento;
+	public void setValor(String valor) {
+		this.valor = valor;
 	}
 	
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
+	@Transactional
+	public Long getValorLong() {
+		if(valor != null && StringUtils.isStrictlyNumeric(valor)) {
+			return Long.parseLong(valor);
+		}
+		return null;
 	}
 
 	@Override
@@ -126,7 +102,7 @@ public class Porta implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Porta other = (Porta) obj;
+		Parametro other = (Parametro) obj;
 		if (codigo == null) {
 			if (other.codigo != null)
 				return false;
