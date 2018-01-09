@@ -19,4 +19,6 @@ public interface UsuariosQueries {
 	
 	public Usuario buscarComGrupos(Long codigo);
 	
+	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupo_codigo);
+	
 }

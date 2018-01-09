@@ -19,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.modelo.Usuario;
+import br.com.utfpr.porta.repositorio.Parametros;
 import br.com.utfpr.porta.repositorio.filtro.UsuarioFiltro;
 import br.com.utfpr.porta.repositorio.paginacao.PaginacaoUtil;
 
@@ -30,6 +32,9 @@ public class UsuariosImpl implements UsuariosQueries {
 
 	@Autowired
 	private PaginacaoUtil paginacaoUtil;
+	
+	@Autowired
+	private Parametros parametroRepositorio;
 	
 	public Optional<Usuario> porEmailEAtivo(String email) {
 		return manager
@@ -71,9 +76,16 @@ public class UsuariosImpl implements UsuariosQueries {
 			
 			if (!StringUtils.isEmpty(filtro.getEmail())) {
 				criteria.add(Restrictions.ilike("email", filtro.getEmail(), MatchMode.START));
-			}
-					
+			}					
 		}
+		
+		Parametro par_cod_grp_usuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
+		if(par_cod_grp_usuario == null || StringUtils.isEmpty(par_cod_grp_usuario.getValor())) {
+			throw new NullPointerException("COD_GRP_USUARIO não foi parametrizado");
+		}
+		
+		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
+		criteria.add(Restrictions.eq("g.codigo", par_cod_grp_usuario.getValorLong()));
 	}
 
 	@Transactional(readOnly = true)
@@ -85,4 +97,15 @@ public class UsuariosImpl implements UsuariosQueries {
 		return (Usuario) criteria.uniqueResult();
 	}
 	
+	@SuppressWarnings("unchecked") 
+	@Transactional(readOnly = true)
+	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupo_codigo) {
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
+		criteria.add(Restrictions.eq("g.codigo", grupo_codigo));
+		criteria.add(Restrictions.eq("ativo", true));
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		return criteria.list();
+	}
+		
 }
