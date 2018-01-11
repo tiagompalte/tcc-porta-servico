@@ -19,6 +19,7 @@ import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
 
+import br.com.utfpr.porta.servico.UsuarioServico;
 import br.com.utfpr.porta.storage.AudioStorage;
 
 @Component
@@ -30,6 +31,9 @@ public class AudioStorageS3 implements AudioStorage {
 	
 	@Autowired
 	private AmazonS3 amazonS3;
+	
+	@Autowired
+	private UsuarioServico usuarioServico;
 
 	@Override
 	public void salvar(String name, MultipartFile file) {
@@ -37,14 +41,17 @@ public class AudioStorageS3 implements AudioStorage {
 		if (file != null && !StringUtils.isEmpty(name)) {			
 			try {
 				AccessControlList acl = new AccessControlList();
-				acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);	
-				verificarExistenciaAudio(name);
+				acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
 				enviarAudio(name, file, acl);
+				LOGGER.info("Áudio salvo no S3 com o nome ".concat(name));
 			} catch (IOException e) {
-				LOGGER.error("Erro salvando arquivo no S3".concat(e.getMessage()));
-				throw new RuntimeException("Erro salvando arquivo no S3", e);
+				usuarioServico.apagarNomeAudio(name);
+				LOGGER.error("Erro salvando arquivo no S3 ".concat(e.getMessage()));
+				throw new RuntimeException("Erro salvando arquivo no S3 ", e);
 			} catch(Exception e) {
+				usuarioServico.apagarNomeAudio(name);
 				LOGGER.error(e.getMessage());
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -82,23 +89,7 @@ public class AudioStorageS3 implements AudioStorage {
 		}		
 		return null;
 	}
-	
-	private void verificarExistenciaAudio(String audio) {
 		
-		InputStream is;
-		try {
-			is = amazonS3.getObject(BUCKET, audio).getObjectContent();			
-		}
-		catch(Exception e) {
-			is = null;
-		}
-		
-		if(is != null) {
-			excluir(audio);
-		}
-		
-	}
-	
 	private ObjectMetadata enviarAudio(String novoNome, MultipartFile file, AccessControlList acl) throws IOException {
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setContentType(file.getContentType());

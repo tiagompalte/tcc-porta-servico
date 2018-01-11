@@ -9,10 +9,12 @@ import java.nio.file.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.utfpr.porta.servico.UsuarioServico;
 import br.com.utfpr.porta.storage.AudioStorage;
 
 @Component
@@ -21,6 +23,9 @@ public class AudioStorageLocal implements AudioStorage {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AudioStorageLocal.class);
 	
 	private Path local;
+	
+	@Autowired
+	private UsuarioServico usuarioServico;
 	
 	public AudioStorageLocal() {
 		String os = System.getProperty("os.name").toLowerCase();
@@ -46,6 +51,10 @@ public class AudioStorageLocal implements AudioStorage {
 				Files.deleteIfExists(this.local.resolve(name));
 				file.transferTo(new File(this.local.toAbsolutePath().toString() + getDefault().getSeparator() + name));
 			} catch (IOException e) {
+				usuarioServico.apagarNomeAudio(name);
+				throw new RuntimeException("Erro ao salvar o áudio", e);
+			} catch(Exception e) {
+				usuarioServico.apagarNomeAudio(name);
 				throw new RuntimeException("Erro ao salvar o áudio", e);
 			}
 		}

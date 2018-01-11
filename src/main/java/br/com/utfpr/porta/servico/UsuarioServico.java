@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.persistence.PersistenceException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,8 @@ public class UsuarioServico {
 	
 	@Autowired
 	private Parametros parametroRepositorio;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UsuarioServico.class);
 	
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
@@ -90,19 +94,20 @@ public class UsuarioServico {
 					
 					usuario.setEstabelecimento(null);
 					
-					if(StringUtils.isEmpty(usuario.getRfid())) {
-						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
-					}
-					
-					if(usuario.isNovo()) {						
-						Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfid(usuario.getRfid());
+					if(!usuario.isNovo()) {	
+						
+						if(StringUtils.isEmpty(usuario.getRfid())) {
+							throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
+						}
+						
+						Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfidAndEmailNot(usuario.getRfid(), usuario.getEmail());
 						if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
 							throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 						}
-					}
-					
-					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+						
+						if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+							throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+						}
 					}
 					
 					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
@@ -171,6 +176,26 @@ public class UsuarioServico {
 			throw new ImpossivelExcluirEntidadeException("Impossível apagar usuário. Ele possui autorizações relacionadas.");
 		}
 		
+	}
+	
+	@Transactional
+	public void apagarNomeAudio(String nomeAudio) {
+		
+		if(StringUtils.isEmpty(nomeAudio)) {
+			return;
+		}
+		
+		try {
+			Optional<Usuario> usuario = usuariosRepositorio.findByNomeAudio(nomeAudio);
+			
+			if(usuario.isPresent()) {
+				usuario.get().setNomeAudio(null);
+				usuariosRepositorio.save(usuario.get());
+			}			
+		}
+		catch(Exception e) {
+			LOGGER.error("Não foi possível apagar nome do áudio ", e);
+		}
 	}
 	
 }

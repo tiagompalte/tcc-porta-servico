@@ -14,5 +14,9 @@ public interface Usuarios extends JpaRepository<Usuario, Long>, UsuariosQueries 
 	public Optional<Usuario> findByEmail(String email);
 	
 	public Optional<Usuario> findByRfid(String rfid);
+	
+	public Optional<Usuario> findByRfidAndEmailNot(String rfid, String email);
+	
+	public Optional<Usuario> findByNomeAudio(String nomeAudio);
 			
 }
