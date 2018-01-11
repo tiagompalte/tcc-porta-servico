@@ -94,20 +94,17 @@ public class UsuarioServico {
 					
 					usuario.setEstabelecimento(null);
 					
-					if(!usuario.isNovo()) {	
-						
-						if(StringUtils.isEmpty(usuario.getRfid())) {
-							throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
-						}
-						
-						Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfidAndEmailNot(usuario.getRfid(), usuario.getEmail());
-						if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
-							throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
-						}
-						
-						if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-							throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-						}
+					if(StringUtils.isEmpty(usuario.getRfid())) {
+						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
+					}
+					
+					Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfidAndEmailNot(usuario.getRfid(), usuario.getEmail());
+					if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
+						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+					}
+					
+					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
 					}
 					
 					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {

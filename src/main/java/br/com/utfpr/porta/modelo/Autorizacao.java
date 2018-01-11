@@ -1,7 +1,6 @@
 package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -10,11 +9,9 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -45,26 +42,14 @@ public class Autorizacao implements Serializable {
 	@Column(name = "hora_fim")
 	private LocalTime horaFim;
 	
-	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")
+	@DateTimeFormat(pattern="dd/MM/yyyy HH:mm")
 	@Column(name = "data_hora_inicio")
 	private LocalDateTime dataHoraInicio; 
 	
-	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm")	
+	@DateTimeFormat(pattern="dd/MM/yyyy HH:mm")
 	@Column(name = "data_hora_fim")
 	private LocalDateTime dataHoraFim;
-	
-	@Transient
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private LocalDate dataTemporaria;
-	
-	@Transient
-	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-	private LocalTime horaInicioTemporaria;
-	
-	@Transient
-	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-	private LocalTime horaFimTemporaria;
-	
+		
 	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
@@ -81,17 +66,7 @@ public class Autorizacao implements Serializable {
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
 	}
-	
-	@PostLoad
-	private void postLoad() {
-		if(tipoAutorizacao != null && tipoAutorizacao.compareTo(TipoAutorizacao.TEMPORARIO) == 0
-				&& dataHoraInicio != null && dataHoraFim != null) {
-			dataTemporaria = dataHoraInicio.toLocalDate();
-			horaInicioTemporaria = dataHoraInicio.toLocalTime();
-			horaFimTemporaria = dataHoraFim.toLocalTime();
-		}
-	}
-	
+		
 	public String getDescricao() {
 		
 		if(tipoAutorizacao != null && id != null && id.getPorta() != null 
@@ -163,30 +138,6 @@ public class Autorizacao implements Serializable {
 		this.dataHoraFim = dataHoraFim;
 	}
 	
-	public LocalDate getDataTemporaria() {
-		return dataTemporaria;
-	}
-
-	public void setDataTemporaria(LocalDate dataTemporaria) {
-		this.dataTemporaria = dataTemporaria;
-	}
-
-	public LocalTime getHoraInicioTemporaria() {
-		return horaInicioTemporaria;
-	}
-
-	public void setHoraInicioTemporaria(LocalTime horaInicioTemporaria) {
-		this.horaInicioTemporaria = horaInicioTemporaria;
-	}
-
-	public LocalTime getHoraFimTemporaria() {
-		return horaFimTemporaria;
-	}
-
-	public void setHoraFimTemporaria(LocalTime horaFimTemporaria) {
-		this.horaFimTemporaria = horaFimTemporaria;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

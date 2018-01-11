@@ -58,18 +58,15 @@ public class AutorizacaoServico {
 			autorizacao.setDataHoraFim(null);
 		}
 		else if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.TEMPORARIO) == 0) {
-			if(autorizacao.getDataTemporaria() == null) {
-				throw new CampoNaoInformadoExcecao("dataTemporaria", "Campo data é obrigatório");
-			}
 			if(autorizacao.getDataHoraInicio() == null) {
-				throw new CampoNaoInformadoExcecao("horaInicioTemporaria", "Campo hora de início é obrigatório");
+				throw new CampoNaoInformadoExcecao("dataHoraInicio", "Campo data hora inicial é obrigatório");
 			}
 			if(autorizacao.getDataHoraFim() == null) {
-				throw new CampoNaoInformadoExcecao("horaFimTemporaria", "Campo hora final é obrigatório");
+				throw new CampoNaoInformadoExcecao("dataHoraFim", "Campo data hora final é obrigatório");
 			}
 			if(autorizacao.getDataHoraInicio() != null && autorizacao.getDataHoraFim() != null
 					&& autorizacao.getDataHoraInicio().isAfter(autorizacao.getDataHoraFim())) {
-				throw new HoraInicialPosteriorHoraFinalExcecao("horaInicioTemporaria", "horaFimTemporaria", "Hora inicial não pode ser posterior a hora final");
+				throw new HoraInicialPosteriorHoraFinalExcecao("dataHoraInicio", "dataHoraFim", "Hora inicial não pode ser posterior a hora final");
 			}
 			
 			autorizacao.setDiaSemana(null);
