@@ -98,6 +98,9 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
+	
+	@Transient
+	private String audio;
 		
 	@PrePersist
 	private void prePersist() {
@@ -224,6 +227,14 @@ public class Usuario implements Serializable {
 
 	public void setEstabelecimento(Estabelecimento estabelecimento) {
 		this.estabelecimento = estabelecimento;
+	}
+	
+	public String getAudio() {
+		return audio;
+	}
+	
+	public void setAudio(String audio) {
+		this.audio = audio;
 	}
 
 	@Override
