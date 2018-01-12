@@ -25,7 +25,7 @@ public class ParametroServico {
 		}
 		
 		if(!StringUtils.isEmpty(parametro.getCodigo())) {
-			parametro.setCodigo(parametro.getCodigo().toUpperCase());
+			parametro.setCodigo(parametro.getCodigo().trim().toUpperCase().replaceAll("[-+.^:,]",""));
 		}
 		
 		parametroRepositorio.save(parametro);
