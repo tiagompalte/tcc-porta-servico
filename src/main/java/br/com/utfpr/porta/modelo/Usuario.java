@@ -250,6 +250,14 @@ public class Usuario implements Serializable {
 	public void setNrTentativaAcessoPorta(Integer nrTentativaAcessoPorta) {
 		this.nrTentativaAcessoPorta = nrTentativaAcessoPorta;
 	}
+	
+	public Integer incrementarNrTentativaAcessoPorta(Integer qtdIncremento) {
+		if(qtdIncremento == null || nrTentativaAcessoPorta == null) {
+			return null;
+		}		
+		nrTentativaAcessoPorta += qtdIncremento;
+		return nrTentativaAcessoPorta;
+	}
 
 	public Integer getNrTentativaAcessoSite() {
 		return nrTentativaAcessoSite;
@@ -257,6 +265,14 @@ public class Usuario implements Serializable {
 
 	public void setNrTentativaAcessoSite(Integer nrTentativaAcessoSite) {
 		this.nrTentativaAcessoSite = nrTentativaAcessoSite;
+	}
+	
+	public Integer incrementarNrTentativaAcessoSite(Integer qtdIncremento) {
+		if(qtdIncremento == null || nrTentativaAcessoSite == null) {
+			return null;
+		}		
+		nrTentativaAcessoSite += qtdIncremento;
+		return nrTentativaAcessoSite;
 	}
 
 	@Override

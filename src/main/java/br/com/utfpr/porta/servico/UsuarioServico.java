@@ -195,4 +195,72 @@ public class UsuarioServico {
 		}
 	}
 	
+	@Transactional
+	public String incrementarNrTentativaAcessoPorta(Long codigoUsuario) {
+		
+		if(codigoUsuario == null) {
+			throw new NullPointerException("Código do usuário não informado");
+		}
+		
+		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
+		
+		if(usuario == null) {
+			throw new NullPointerException("Usuário não encotrado");
+		}
+		
+		Integer nrTentativaAtual = usuario.incrementarNrTentativaAcessoPorta(1);
+		
+		Parametro parTentativaMaxAcessoPorta = parametroRepositorio.findOne("NR_TENTATIVA_MAX_PORTA");
+		
+		String retorno = null;
+		if(parTentativaMaxAcessoPorta != null && parTentativaMaxAcessoPorta.getValorLong() != null) {
+			
+			retorno = nrTentativaAtual.toString().concat(" de ").concat(parTentativaMaxAcessoPorta.getValor()).concat(" tentativas");
+			
+			if(parTentativaMaxAcessoPorta.getValorLong().compareTo(nrTentativaAtual.longValue()) <= 0) {				
+				usuario.setAtivo(false);
+				usuario.setNrTentativaAcessoPorta(0);
+				retorno = "Usuário bloqueado";
+			}
+		}
+		
+		usuariosRepositorio.save(usuario);
+		
+		return retorno;
+	}
+	
+	@Transactional
+	public String incrementarNrTentativaAcessoSite(Long codigoUsuario) {
+		
+		if(codigoUsuario == null) {
+			throw new NullPointerException("Código do usuário não informado");
+		}
+		
+		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
+		
+		if(usuario == null) {
+			throw new NullPointerException("Usuário não encotrado");
+		}
+		
+		Integer nrTentativaAtual = usuario.incrementarNrTentativaAcessoSite(1);
+		
+		Parametro parTentativaMaxAcessoSite = parametroRepositorio.findOne("NR_TENTATIVA_MAX_SITE");
+		
+		String retorno = null;
+		if(parTentativaMaxAcessoSite != null && parTentativaMaxAcessoSite.getValorLong() != null) {
+			
+			retorno = nrTentativaAtual.toString().concat(" de ").concat(parTentativaMaxAcessoSite.getValor()).concat(" tentativas");
+			
+			if(parTentativaMaxAcessoSite.getValorLong().compareTo(nrTentativaAtual.longValue()) <= 0) {				
+				usuario.setAtivo(false);
+				usuario.setNrTentativaAcessoSite(0);
+				retorno = "Usuário bloqueado";
+			}
+		}
+		
+		usuariosRepositorio.save(usuario);
+		
+		return retorno;
+	}
+	
 }
