@@ -99,6 +99,12 @@ public class Usuario implements Serializable {
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
 	
+	@Column(name = "nr_tentativa_acesso_porta")
+	private Integer nrTentativaAcessoPorta;
+	
+	@Column(name = "nr_tentativa_acesso_site")
+	private Integer nrTentativaAcessoSite;
+	
 	@Transient
 	private String audio;
 		
@@ -236,6 +242,22 @@ public class Usuario implements Serializable {
 	public void setAudio(String audio) {
 		this.audio = audio;
 	}
+	
+	public Integer getNrTentativaAcessoPorta() {
+		return nrTentativaAcessoPorta;
+	}
+
+	public void setNrTentativaAcessoPorta(Integer nrTentativaAcessoPorta) {
+		this.nrTentativaAcessoPorta = nrTentativaAcessoPorta;
+	}
+
+	public Integer getNrTentativaAcessoSite() {
+		return nrTentativaAcessoSite;
+	}
+
+	public void setNrTentativaAcessoSite(Integer nrTentativaAcessoSite) {
+		this.nrTentativaAcessoSite = nrTentativaAcessoSite;
+	}
 
 	@Override
 	public int hashCode() {
@@ -261,5 +283,5 @@ public class Usuario implements Serializable {
 			return false;
 		return true;
 	}
-
+	
 }
