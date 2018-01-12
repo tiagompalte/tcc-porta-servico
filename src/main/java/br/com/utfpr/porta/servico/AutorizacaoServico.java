@@ -136,15 +136,15 @@ public class AutorizacaoServico {
 			else if(TipoAutorizacao.PROGRAMADO.compareTo(aut.getTipoAutorizacao()) == 0) {
 				if(aut.getDiaSemana() != null && aut.getHoraInicio() != null && aut.getHoraFim() != null 
 						&& aut.getDiaSemana().ordinal() == dataHora.getDayOfWeek().getValue()
-						&& aut.getHoraInicio().isAfter(dataHora.toLocalTime())
-						&& aut.getHoraFim().isBefore(dataHora.toLocalTime())) {
+						&& aut.getHoraInicio().isBefore(dataHora.toLocalTime())
+						&& aut.getHoraFim().isAfter(dataHora.toLocalTime())) {
 					return true;
 				}
 			}
-			else if(TipoAutorizacao.PERMANENTE.compareTo(aut.getTipoAutorizacao()) == 0) {
+			else if(TipoAutorizacao.TEMPORARIO.compareTo(aut.getTipoAutorizacao()) == 0) {
 				if(aut.getDataHoraInicio() != null && aut.getDataHoraFim() != null
-						&& aut.getDataHoraInicio().isAfter(dataHora)
-						&& aut.getDataHoraFim().isBefore(dataHora)) {
+						&& aut.getDataHoraInicio().isBefore(dataHora)
+						&& aut.getDataHoraFim().isAfter(dataHora)) {
 					return true;
 				}
 			}
