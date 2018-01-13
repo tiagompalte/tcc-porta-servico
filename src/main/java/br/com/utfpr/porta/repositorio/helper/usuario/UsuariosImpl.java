@@ -51,12 +51,10 @@ public class UsuariosImpl implements UsuariosQueries {
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
-	public Page<Usuario> filtrar(UsuarioFiltro filtro, Pageable pageable) {
-		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
-		
+	public Page<Usuario> filtrar(UsuarioFiltro filtro, Pageable pageable) {		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);		
 		paginacaoUtil.preparar(criteria, pageable);
-		adicionarFiltro(filtro, criteria);
-		
+		adicionarFiltro(filtro, criteria);		
 		List<Usuario> filtrados = criteria.list();
 		return new PageImpl<Usuario>(filtrados, pageable, total(filtro));
 	}

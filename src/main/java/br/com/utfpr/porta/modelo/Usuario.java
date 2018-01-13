@@ -44,7 +44,7 @@ public class Usuario implements Serializable {
 	
 	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "codigo_pessoa")
+	@JoinColumn(name = "codigo_pessoa", nullable=false)
 	@Valid
 	private Pessoa pessoa;
 			
@@ -80,8 +80,7 @@ public class Usuario implements Serializable {
 	
 	@JsonIgnore
 	@OneToOne
-	@JoinTable(name = "estabelecimento", joinColumns = @JoinColumn(name = "codigo_responsavel"),
-				inverseJoinColumns = @JoinColumn(name = "codigo"))
+	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 		
 	@JsonIgnore

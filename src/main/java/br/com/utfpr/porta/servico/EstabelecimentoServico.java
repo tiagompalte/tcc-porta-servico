@@ -11,6 +11,7 @@ import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Enderecos;
 import br.com.utfpr.porta.repositorio.Estabelecimentos;
+import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.EnderecoJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
@@ -27,6 +28,9 @@ public class EstabelecimentoServico {
 	@Autowired
 	private UsuarioServico usuarioServico;
 	
+	@Autowired
+	private Usuarios usuarioRepositorio;
+	
 	@Transactional
 	public void salvar(Estabelecimento estabelecimento) {
 		
@@ -38,12 +42,16 @@ public class EstabelecimentoServico {
 			throw new NullPointerException("Endereço não informado");
 		}
 		
-		if(estabelecimento.isNovo()) {			
+		boolean estabelecimento_novo = false;
+		if(estabelecimento.isNovo()) {
+			estabelecimento_novo = true;
 			Endereco enderecoBase = enderecosRespositorio.findByCepAndNumero(
 					estabelecimento.getEndereco().getCep(), estabelecimento.getEndereco().getNumero());
 			
-			if(enderecoBase != null && estabelecimento.getEndereco().getComplemento() != null && enderecoBase.getComplemento() != null 
-					&& estabelecimento.getEndereco().getComplemento().compareTo(enderecoBase.getComplemento()) == 0) {
+			if(enderecoBase != null && 
+					((estabelecimento.getEndereco().getComplemento() != null && enderecoBase.getComplemento() != null 
+						&& estabelecimento.getEndereco().getComplemento().trim().compareTo(enderecoBase.getComplemento().trim()) == 0)
+					|| (estabelecimento.getEndereco().getComplemento() == null && enderecoBase.getComplemento() == null))) {
 				throw new EnderecoJaCadastradoExcecao("Endereço já cadastrado");
 			}
 		}
@@ -74,8 +82,13 @@ public class EstabelecimentoServico {
 			estabelecimento.setAtivo(Boolean.TRUE);
 		}
 							
-		estabelecimentosRepositorio.save(estabelecimento);
+		Estabelecimento estabelecimentoSalvo = estabelecimentosRepositorio.save(estabelecimento);
 		
+		if(estabelecimentoSalvo != null && estabelecimentoSalvo.getCodigo() != null && estabelecimento_novo) {
+			usuarioSalvo.setEstabelecimento(estabelecimentoSalvo);
+			usuarioRepositorio.save(usuarioSalvo);
+		}
+				
 	}
 	
 	@Transactional

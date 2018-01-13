@@ -103,9 +103,9 @@ public class UsuarioServico {
 						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 					}
 					
-					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
-						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-					}
+//					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+//						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+//					}
 					
 					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
 						if (usuario.isNovo()) {
@@ -152,6 +152,8 @@ public class UsuarioServico {
 		if(usuario.isNovo()) {
 			usuario.setPessoa(pessoaSalva);	
 			usuario.setAtivo(Boolean.TRUE);
+			usuario.setNrTentativaAcessoPorta(0);
+			usuario.setNrTentativaAcessoSite(0);
 		}
 		
 		return usuariosRepositorio.save(usuario);
