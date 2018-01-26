@@ -3,6 +3,7 @@ package br.com.utfpr.porta.modelo;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -76,6 +77,28 @@ public class Autorizacao implements Serializable {
 					+ " usuário '" + id.getUsuario().getPessoa().getNome() + "'"; 
 		}			
 		return "autorização";
+	}
+	
+	public String getDetalhes() {
+		
+		DateTimeFormatter dataHoraFormatador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		DateTimeFormatter horaFormatador = DateTimeFormatter.ofPattern("HH:mm");
+		
+		if(tipoAutorizacao != null) {
+			switch(tipoAutorizacao) {
+			case PERMANENTE:
+				return "Qualquer dia e horário";
+			case PROGRAMADO:
+				return diaSemana.getDescricao().concat(": ")
+							.concat(horaInicio.format(horaFormatador).concat(" até ")
+							.concat(horaFim.format(horaFormatador)));
+			case TEMPORARIO:
+				return dataHoraInicio.format(dataHoraFormatador).concat(" até ")
+							.concat(dataHoraFim.format(dataHoraFormatador));
+			}
+		}
+		
+		return "";
 	}
 		
 	public boolean isNovo() {
