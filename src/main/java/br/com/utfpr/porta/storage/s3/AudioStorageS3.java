@@ -3,11 +3,11 @@ package br.com.utfpr.porta.storage.s3;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -38,7 +38,7 @@ public class AudioStorageS3 implements AudioStorage {
 	@Override
 	public void salvar(String name, MultipartFile file) {
 		
-		if (file != null && !StringUtils.isEmpty(name)) {			
+		if (file != null && !Strings.isEmpty(name)) {			
 			try {
 				AccessControlList acl = new AccessControlList();
 				acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
@@ -59,7 +59,7 @@ public class AudioStorageS3 implements AudioStorage {
 	@Override
 	public byte[] recuperar(String audio) {	
 		
-		if(StringUtils.isEmpty(audio)) {
+		if(Strings.isEmpty(audio)) {
 			return null;
 		}
 		
@@ -76,7 +76,7 @@ public class AudioStorageS3 implements AudioStorage {
 
 	@Override
 	public void excluir(String audio) {
-		if(StringUtils.isEmpty(audio)) {
+		if(Strings.isEmpty(audio)) {
 			return;
 		}		
 		amazonS3.deleteObjects(new DeleteObjectsRequest(BUCKET).withKeys(audio));
@@ -84,7 +84,7 @@ public class AudioStorageS3 implements AudioStorage {
 
 	@Override
 	public String getUrl(String audio) {
-		if (!StringUtils.isEmpty(audio)) {
+		if (!Strings.isEmpty(audio)) {
 			return "https://s3-sa-east-1.amazonaws.com/awporta/" + audio;
 		}		
 		return null;

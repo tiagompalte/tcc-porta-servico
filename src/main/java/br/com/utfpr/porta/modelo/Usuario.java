@@ -23,9 +23,6 @@ import javax.validation.Valid;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import br.com.utfpr.porta.validacao.AtributoConfirmacao;
 
 @Entity
@@ -37,64 +34,50 @@ public class Usuario implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "codigo_pessoa", nullable=false)
 	@Valid
 	private Pessoa pessoa;
 			
-	@JsonIgnore
 	@NotBlank(message = "E-mail é obrigatório")
 	@Email(message = "E-mail inválido")
 	private String email;
 	
-	@JsonIgnore
 	private Boolean ativo;
 	
-	@JsonIgnore
 	@Column(name = "senha_site")
 	private String senhaSite;
 	
-	@JsonIgnore
 	@Transient
 	private String confirmacaoSenhaSite;
 	
-	@JsonIgnore
 	@Column(name = "senha_teclado")
 	private String senhaTeclado;
 	
-	@JsonIgnore
 	@Transient
 	private String confirmacaoSenhaTeclado;
 
-	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "codigo_usuario"), 
 				inverseJoinColumns = @JoinColumn(name = "codigo_grupo"))	
 	private List<Grupo> grupos;
 	
-	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 		
-	@JsonIgnore
 	private String rfid;
 			
-	@JsonIgnore
 	@Column(name = "nome_audio")
 	private String nomeAudio;
 	
-	@JsonIgnore
 	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
-	@JsonIgnore
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
 	
@@ -103,10 +86,7 @@ public class Usuario implements Serializable {
 	
 	@Column(name = "nr_tentativa_acesso_site")
 	private Integer nrTentativaAcessoSite;
-	
-	@Transient
-	private String audio;
-		
+			
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
@@ -125,7 +105,6 @@ public class Usuario implements Serializable {
 		this.pessoa.setTipoPessoa(TipoPessoa.FISICA);		
 	}
 	
-	@JsonInclude
 	public String getCodigoNome() {
 		if(pessoa == null) {			
 			return codigo.toString();
@@ -133,7 +112,6 @@ public class Usuario implements Serializable {
 		return codigo.toString().concat(" - ").concat(pessoa.getNome()); 
 	}
 		
-	@JsonIgnore
 	public boolean isNovo() {
 		return codigo == null;
 	}
@@ -233,15 +211,7 @@ public class Usuario implements Serializable {
 	public void setEstabelecimento(Estabelecimento estabelecimento) {
 		this.estabelecimento = estabelecimento;
 	}
-	
-	public String getAudio() {
-		return audio;
-	}
-	
-	public void setAudio(String audio) {
-		this.audio = audio;
-	}
-	
+		
 	public Integer getNrTentativaAcessoPorta() {
 		return nrTentativaAcessoPorta;
 	}
