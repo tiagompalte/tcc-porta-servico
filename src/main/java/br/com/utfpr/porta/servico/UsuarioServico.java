@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Grupo;
 import br.com.utfpr.porta.modelo.Parametro;
@@ -54,7 +54,7 @@ public class UsuarioServico {
 			throw new EmailUsuarioJaCadastradoExcecao("E-mail já cadastrado");
 		}
 		
-		if(StringUtils.isEmpty(usuario.getSenhaSite())) {
+		if(Strings.isEmpty(usuario.getSenhaSite())) {
 			if (usuario.isNovo()) {
 				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
 			}
@@ -94,7 +94,7 @@ public class UsuarioServico {
 					
 					usuario.setEstabelecimento(null);
 					
-					if(StringUtils.isEmpty(usuario.getRfid())) {
+					if(Strings.isEmpty(usuario.getRfid())) {
 						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
 					}
 					
@@ -103,11 +103,11 @@ public class UsuarioServico {
 						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 					}
 					
-					if(StringUtils.isEmpty(usuario.getNomeAudio())) {
+					if(Strings.isEmpty(usuario.getNomeAudio())) {
 						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
 					}
 					
-					if(StringUtils.isEmpty(usuario.getSenhaTeclado())) {
+					if(Strings.isEmpty(usuario.getSenhaTeclado())) {
 						if (usuario.isNovo()) {
 							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
 						}
@@ -180,7 +180,7 @@ public class UsuarioServico {
 	@Transactional
 	public void apagarNomeAudio(String nomeAudio) {
 		
-		if(StringUtils.isEmpty(nomeAudio)) {
+		if(Strings.isEmpty(nomeAudio)) {
 			return;
 		}
 		
@@ -232,6 +232,24 @@ public class UsuarioServico {
 	}
 	
 	@Transactional
+	public Usuario zerarNrTentativaAcessoPorta(Long codigoUsuario) {
+		
+		if(codigoUsuario == null) {
+			throw new NullPointerException("Código do usuário não informado");
+		}
+		
+		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
+		
+		if(usuario == null) {
+			throw new NullPointerException("Usuário não encotrado");
+		}
+		
+		usuario.setNrTentativaAcessoPorta(0);
+		
+		return usuariosRepositorio.save(usuario);
+	}
+	
+	@Transactional
 	public String incrementarNrTentativaAcessoSite(Long codigoUsuario) {
 		
 		if(codigoUsuario == null) {
@@ -263,6 +281,24 @@ public class UsuarioServico {
 		usuariosRepositorio.save(usuario);
 		
 		return retorno;
+	}
+	
+	@Transactional
+	public Usuario zerarNrTentativaAcessoSite(Long codigoUsuario) {
+		
+		if(codigoUsuario == null) {
+			throw new NullPointerException("Código do usuário não informado");
+		}
+		
+		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
+		
+		if(usuario == null) {
+			throw new NullPointerException("Usuário não encotrado");
+		}
+		
+		usuario.setNrTentativaAcessoSite(0);
+		
+		return usuariosRepositorio.save(usuario);
 	}
 	
 }
