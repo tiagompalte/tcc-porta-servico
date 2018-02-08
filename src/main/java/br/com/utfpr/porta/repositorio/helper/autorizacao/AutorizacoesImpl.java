@@ -115,7 +115,7 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 		delete.where(cb.and(
 				cb.equal(autorizacao.get("tipoAutorizacao"), TipoAutorizacao.TEMPORARIO.name()),
 				cb.lessThan(autorizacao.get("dataHoraFim"), localDateTimeAtual)));
-		manager.createQuery(delete).executeUpdate();	
+		manager.createQuery(delete).executeUpdate();		
 	}
 	
 }

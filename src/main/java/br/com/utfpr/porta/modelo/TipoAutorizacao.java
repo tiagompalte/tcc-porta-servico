@@ -4,7 +4,8 @@ public enum TipoAutorizacao {
 	
 	PERMANENTE("Permanete"),
 	TEMPORARIO("Temporário"),
-	PROGRAMADO("Programado");
+	SEMANAL("Semanal"),
+	MENSAL("Mensal");
 	
 	private String descricao;
 	

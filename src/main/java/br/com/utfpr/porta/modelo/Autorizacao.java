@@ -17,6 +17,8 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import br.com.utfpr.porta.validacao.DiaMes;
+
 @Entity
 @Table(name = "autorizacao")
 public class Autorizacao implements Serializable {
@@ -35,6 +37,10 @@ public class Autorizacao implements Serializable {
 	@Column(name = "dia_semana")
 	private DiaSemana diaSemana;
 	
+	@DiaMes
+	@Column(name = "dia_mes")
+	private Integer diaMes;
+			
 	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
 	@Column(name = "hora_inicio")
 	private LocalTime horaInicio;
@@ -88,7 +94,11 @@ public class Autorizacao implements Serializable {
 			switch(tipoAutorizacao) {
 			case PERMANENTE:
 				return "Qualquer dia e horário";
-			case PROGRAMADO:
+			case MENSAL:
+				return "Todo mês no dia ".concat(diaMes.toString()).concat(": ")
+						.concat(horaInicio.format(horaFormatador).concat(" até ")
+						.concat(horaFim.format(horaFormatador)));
+			case SEMANAL:
 				return diaSemana.getDescricao().concat(": ")
 							.concat(horaInicio.format(horaFormatador).concat(" até ")
 							.concat(horaFim.format(horaFormatador)));
@@ -127,6 +137,14 @@ public class Autorizacao implements Serializable {
 
 	public void setDiaSemana(DiaSemana diaSemana) {
 		this.diaSemana = diaSemana;
+	}
+
+	public Integer getDiaMes() {
+		return diaMes;
+	}
+
+	public void setDiaMes(Integer diaMes) {
+		this.diaMes = diaMes;
 	}
 
 	public LocalTime getHoraInicio() {

@@ -18,6 +18,7 @@ import br.com.utfpr.porta.repositorio.Autorizacoes;
 import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
 import br.com.utfpr.porta.servico.excecao.HoraInicialPosteriorHoraFinalExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
+import br.com.utfpr.porta.servico.excecao.InformacaoInvalidaException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
 @Service
@@ -39,10 +40,21 @@ public class AutorizacaoServico {
 			throw new CampoNaoInformadoExcecao("id.porta", "Porta é obrigatório");
 		}
 		
-		if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.PROGRAMADO) == 0) {
-			if(autorizacao.getDiaSemana() == null) {
+		if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.SEMANAL) == 0
+				|| autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.MENSAL) == 0) {
+			
+			if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.SEMANAL) == 0 && autorizacao.getDiaSemana() == null) {
 				throw new CampoNaoInformadoExcecao("diaSemana", "Campo dia da semana é obrigatório");
 			}
+			else {
+				if(autorizacao.getDiaMes() == null) {
+					throw new CampoNaoInformadoExcecao("diaMes", "Campo dia do mês é obrigatório");
+				}
+				else if(autorizacao.getDiaMes().compareTo(1) < 0 || autorizacao.getDiaMes().compareTo(31) > 0) {
+					throw new InformacaoInvalidaException("diaMes", "Dia do mês deve estar entre 1 e 31");
+				}
+			}
+			
 			if(autorizacao.getHoraInicio() == null) {
 				throw new CampoNaoInformadoExcecao("horaInicio", "Campo hora de início é obrigatório");
 			}
@@ -129,24 +141,33 @@ public class AutorizacaoServico {
 		}
 		
 		for(Autorizacao aut : lista) {
+			
+			if(aut.getTipoAutorizacao() == null) {
+				continue;
+			}
 						
 			if(TipoAutorizacao.PERMANENTE.compareTo(aut.getTipoAutorizacao()) == 0) {
 				return true;
 			}
-			else if(TipoAutorizacao.PROGRAMADO.compareTo(aut.getTipoAutorizacao()) == 0) {
-				if(aut.getDiaSemana() != null && aut.getHoraInicio() != null && aut.getHoraFim() != null 
+			else if(TipoAutorizacao.MENSAL.compareTo(aut.getTipoAutorizacao()) == 0 
+					&& aut.getDiaMes() != null && aut.getHoraInicio() != null && aut.getHoraFim() != null
+					&& aut.getDiaMes().compareTo(dataHora.getDayOfMonth()) == 0
+					&& aut.getHoraInicio().isBefore(dataHora.toLocalTime())
+					&& aut.getHoraFim().isAfter(dataHora.toLocalTime())) {
+				return true;
+			}
+			else if(TipoAutorizacao.SEMANAL.compareTo(aut.getTipoAutorizacao()) == 0 
+						&& aut.getDiaSemana() != null && aut.getHoraInicio() != null && aut.getHoraFim() != null 
 						&& aut.getDiaSemana().ordinal() == dataHora.getDayOfWeek().getValue()
 						&& aut.getHoraInicio().isBefore(dataHora.toLocalTime())
 						&& aut.getHoraFim().isAfter(dataHora.toLocalTime())) {
-					return true;
-				}
+				return true;				
 			}
-			else if(TipoAutorizacao.TEMPORARIO.compareTo(aut.getTipoAutorizacao()) == 0) {
-				if(aut.getDataHoraInicio() != null && aut.getDataHoraFim() != null
-						&& aut.getDataHoraInicio().isBefore(dataHora)
-						&& aut.getDataHoraFim().isAfter(dataHora)) {
-					return true;
-				}
+			else if(TipoAutorizacao.TEMPORARIO.compareTo(aut.getTipoAutorizacao()) == 0 
+					&& aut.getDataHoraInicio() != null && aut.getDataHoraFim() != null
+					&& aut.getDataHoraInicio().isBefore(dataHora)
+					&& aut.getDataHoraFim().isAfter(dataHora)) {
+				return true;
 			}
 		}
 		
