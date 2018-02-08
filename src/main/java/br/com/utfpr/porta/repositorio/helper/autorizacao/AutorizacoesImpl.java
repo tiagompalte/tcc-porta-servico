@@ -1,9 +1,15 @@
 package br.com.utfpr.porta.repositorio.helper.autorizacao;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -15,9 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Autorizacao;
+import br.com.utfpr.porta.modelo.TipoAutorizacao;
 import br.com.utfpr.porta.repositorio.filtro.AutorizacaoFiltro;
 import br.com.utfpr.porta.repositorio.paginacao.PaginacaoUtil;
 
@@ -76,19 +82,40 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 
 	private void adicionarFiltro(AutorizacaoFiltro filtro, Criteria criteria) {
 		if (filtro != null) {
-			if (filtro.getUsuario() != null && !StringUtils.isEmpty(filtro.getUsuario().getCodigo())) {
+			if (filtro.getUsuario() != null && filtro.getUsuario().getCodigo() != null) {
 				criteria.add(Restrictions.eq("id.usuario", filtro.getUsuario()));
 			}
-			if (filtro.getPorta() != null && !StringUtils.isEmpty(filtro.getPorta().getCodigo())) {
+			if (filtro.getPorta() != null && filtro.getPorta().getCodigo() != null) {
 				criteria.add(Restrictions.eq("id.porta", filtro.getPorta()));
 			}
-			if (filtro.getTipoAutorizacao() != null && !StringUtils.isEmpty(filtro.getTipoAutorizacao().name())) {
+			if (filtro.getTipoAutorizacao() != null && filtro.getTipoAutorizacao() != null) {
 				criteria.add(Restrictions.eq("tipoAutorizacao", filtro.getTipoAutorizacao()));
 			}
-			if (filtro.getEstabelecimento() != null && !StringUtils.isEmpty(filtro.getEstabelecimento().getCodigo())) {
+			if (filtro.getEstabelecimento() != null && filtro.getEstabelecimento().getCodigo() != null) {
 				criteria.add(Restrictions.eq("id.estabelecimento", filtro.getEstabelecimento()));
 			}
 		}
+	}
+	
+	@Transactional()
+	public void apagarAutorizacoesTemporariasVencidas(Date dataHoraAtual) {
+		
+		LocalDateTime localDateTimeAtual;
+		if(dataHoraAtual == null) {
+			localDateTimeAtual = LocalDateTime.now().minusDays(1);
+		}
+		else {
+			localDateTimeAtual = LocalDateTime.ofInstant(dataHoraAtual.toInstant(), 
+									ZoneId.from(dataHoraAtual.toInstant())).minusDays(1);
+		}
+						
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaDelete<Autorizacao> delete = cb.createCriteriaDelete(Autorizacao.class);
+		Root<Autorizacao> autorizacao = delete.getRoot();
+		delete.where(cb.and(
+				cb.equal(autorizacao.get("tipoAutorizacao"), TipoAutorizacao.TEMPORARIO.name()),
+				cb.lessThan(autorizacao.get("dataHoraFim"), localDateTimeAtual)));
+		manager.createQuery(delete).executeUpdate();	
 	}
 	
 }

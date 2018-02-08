@@ -1,5 +1,6 @@
 package br.com.utfpr.porta.repositorio.helper.autorizacao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -17,5 +18,7 @@ public interface AutorizacoesQueries {
 	public List<Autorizacao> findByCodigoUsuario(Long codigoUsuario);
 	
 	public Page<Autorizacao> filtrar(AutorizacaoFiltro filtro, Pageable pageable);
+	
+	public void apagarAutorizacoesTemporariasVencidas(Date dataAtual);
 
 }
