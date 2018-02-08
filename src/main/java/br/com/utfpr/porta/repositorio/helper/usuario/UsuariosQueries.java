@@ -21,4 +21,6 @@ public interface UsuariosQueries {
 	
 	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupo_codigo);
 	
+	public int apagarNomeAudio(String nomeAudio);
+	
 }

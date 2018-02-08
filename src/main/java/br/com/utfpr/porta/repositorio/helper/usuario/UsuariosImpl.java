@@ -5,7 +5,11 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
 
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
@@ -17,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.modelo.Usuario;
@@ -68,17 +71,17 @@ public class UsuariosImpl implements UsuariosQueries {
 
 	private void adicionarFiltro(UsuarioFiltro filtro, Criteria criteria) {
 		if (filtro != null) {
-			if (!StringUtils.isEmpty(filtro.getNome())) {
+			if (!Strings.isEmpty(filtro.getNome())) {
 				criteria.add(Restrictions.ilike("nome", filtro.getNome(), MatchMode.ANYWHERE));
 			}
 			
-			if (!StringUtils.isEmpty(filtro.getEmail())) {
+			if (!Strings.isEmpty(filtro.getEmail())) {
 				criteria.add(Restrictions.ilike("email", filtro.getEmail(), MatchMode.START));
 			}					
 		}
 		
 		Parametro par_cod_grp_usuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
-		if(par_cod_grp_usuario == null || StringUtils.isEmpty(par_cod_grp_usuario.getValor())) {
+		if(par_cod_grp_usuario == null || Strings.isEmpty(par_cod_grp_usuario.getValor())) {
 			throw new NullPointerException("COD_GRP_USUARIO não foi parametrizado");
 		}
 		
@@ -104,6 +107,16 @@ public class UsuariosImpl implements UsuariosQueries {
 		criteria.add(Restrictions.eq("ativo", true));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
+	}
+	
+	@Transactional()
+	public int apagarNomeAudio(String nomeAudio) {
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaUpdate<Usuario> update = cb.createCriteriaUpdate(Usuario.class);
+		Root<Usuario> usuario = update.from(Usuario.class);
+		update.set("nomeAudio", null);
+		update.where(cb.equal(usuario.get("nomeAudio"), nomeAudio));
+		return manager.createQuery(update).executeUpdate();		
 	}
 		
 }
