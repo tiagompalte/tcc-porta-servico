@@ -24,6 +24,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import br.com.utfpr.porta.validacao.AtributoConfirmacao;
+import br.com.utfpr.porta.validacao.SenhaSite;
 
 @Entity
 @Table(name = "usuario")
@@ -49,6 +50,7 @@ public class Usuario implements Serializable {
 	
 	private Boolean ativo;
 	
+	@SenhaSite
 	@Column(name = "senha_site")
 	private String senhaSite;
 	
