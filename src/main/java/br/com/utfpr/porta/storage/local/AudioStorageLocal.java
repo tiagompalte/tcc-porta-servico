@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.utfpr.porta.modelo.Parametro;
+import br.com.utfpr.porta.repositorio.Parametros;
 import br.com.utfpr.porta.servico.UsuarioServico;
 import br.com.utfpr.porta.storage.AudioStorage;
 
@@ -27,9 +29,12 @@ public class AudioStorageLocal implements AudioStorage {
 	@Autowired
 	private UsuarioServico usuarioServico;
 	
+	@Autowired
+	private Parametros parametroRepositorio;
+	
 	public AudioStorageLocal() {
 		String os = System.getProperty("os.name").toLowerCase();
-		if(!StringUtils.isEmpty(os) && os.indexOf("win") >= 0) {
+		if(!Strings.isEmpty(os) && os.indexOf("win") >= 0) {
 			this.local = getDefault().getPath(System.getenv("USERPROFILE"), ".portaaudios");
 		}
 		else {
@@ -45,17 +50,17 @@ public class AudioStorageLocal implements AudioStorage {
 
 	@Override
 	public void salvar(String name, MultipartFile file) {
-		if (file != null && !StringUtils.isEmpty(name)) {
+		if (file != null && !Strings.isEmpty(name)) {
 			try {
 				//Verifica se o áudio já existe na pasta, para gravar uma nova senha falada no lugar, nos casos de modificação
 				Files.deleteIfExists(this.local.resolve(name));
 				file.transferTo(new File(this.local.toAbsolutePath().toString() + getDefault().getSeparator() + name));
 			} catch (IOException e) {
 				usuarioServico.apagarNomeAudio(name);
-				throw new RuntimeException("Erro ao salvar o áudio", e);
+				throw new RuntimeException("Erro ao salvar o áudio. ", e);
 			} catch(Exception e) {
 				usuarioServico.apagarNomeAudio(name);
-				throw new RuntimeException("Erro ao salvar o áudio", e);
+				throw new RuntimeException("Erro ao salvar o áudio. ", e);
 			}
 		}
 	}
@@ -65,7 +70,7 @@ public class AudioStorageLocal implements AudioStorage {
 		try {
 			return Files.readAllBytes(this.local.resolve(nome));
 		} catch (IOException e) {
-			throw new RuntimeException("Erro lendo o áudio", e);
+			throw new RuntimeException("Erro lendo o áudio. ", e);
 		}
 	}
 	
@@ -80,7 +85,14 @@ public class AudioStorageLocal implements AudioStorage {
 	
 	@Override
 	public String getUrl(String audio) {
-		return "http://localhost:8090/porta/audios/" + audio;
+		
+		Parametro parUrlAudio = parametroRepositorio.findOne("AUDIO_URL");
+		
+		if(parUrlAudio == null || Strings.isEmpty(parUrlAudio.getValor())) {
+			throw new RuntimeException("Parâmetro da URL de áudio não cadastrado");
+		}
+		
+		return parUrlAudio.getValor().concat("/audios/").concat(audio);
 	}
 	
 	private void criarPastas() {
