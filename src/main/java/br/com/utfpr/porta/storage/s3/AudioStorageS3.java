@@ -70,6 +70,8 @@ public class AudioStorageS3 implements AudioStorage {
 			LOGGER.error(String.format("Não conseguiu recuperar o áudio %s do S3", audio).concat(e.getMessage()));
 		} catch (NullPointerException e) {
 			LOGGER.error(String.format("O áudio %s não existe. ", audio).concat(e.getMessage()));
+		} catch(Exception e) {
+			LOGGER.error("Exceção ao recuperar áudio: ", e);
 		}
 		return null;
 	}
@@ -85,7 +87,7 @@ public class AudioStorageS3 implements AudioStorage {
 	@Override
 	public String getUrl(String audio) {
 		if (!Strings.isEmpty(audio)) {
-			return "https://s3-sa-east-1.amazonaws.com/awporta/" + audio;
+			return "https://s3-sa-east-1.amazonaws.com/".concat(BUCKET).concat("/") + audio;
 		}		
 		return null;
 	}
