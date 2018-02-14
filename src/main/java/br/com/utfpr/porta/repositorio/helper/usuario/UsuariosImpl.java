@@ -111,12 +111,15 @@ public class UsuariosImpl implements UsuariosQueries {
 	
 	@Transactional()
 	public int apagarNomeAudio(String nomeAudio) {
-		CriteriaBuilder cb = manager.getCriteriaBuilder();
-		CriteriaUpdate<Usuario> update = cb.createCriteriaUpdate(Usuario.class);
-		Root<Usuario> usuario = update.from(Usuario.class);
-		update.set("nomeAudio", null);
-		update.where(cb.equal(usuario.get("nomeAudio"), nomeAudio));
-		return manager.createQuery(update).executeUpdate();		
+		
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		CriteriaUpdate<Usuario> criteria = builder.createCriteriaUpdate(Usuario.class);
+		Root<Usuario> root = criteria.from(Usuario.class);
+
+		criteria.set("nomeAudio", true)
+			.where(builder.lessThan(root.<String>get("nomeAudio"), nomeAudio));
+		
+		return this.manager.createQuery(criteria).executeUpdate();
 	}
 		
 }
