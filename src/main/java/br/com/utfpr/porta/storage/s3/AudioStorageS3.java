@@ -19,7 +19,7 @@ import com.amazonaws.services.s3.model.Permission;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
 
-import br.com.utfpr.porta.servico.UsuarioServico;
+import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.storage.AudioStorage;
 
 @Component
@@ -33,7 +33,7 @@ public class AudioStorageS3 implements AudioStorage {
 	private AmazonS3 amazonS3;
 	
 	@Autowired
-	private UsuarioServico usuarioServico;
+	private Usuarios usuarioRepositorio;
 
 	@Override
 	public void salvar(String name, MultipartFile file) {
@@ -45,11 +45,11 @@ public class AudioStorageS3 implements AudioStorage {
 				enviarAudio(name, file, acl);
 				LOGGER.info("Áudio salvo no S3 com o nome ".concat(name));
 			} catch (IOException e) {
-				usuarioServico.apagarNomeAudio(name);
+				usuarioRepositorio.apagarNomeAudio(name);
 				LOGGER.error("Erro salvando arquivo no S3 ".concat(e.getMessage()));
 				throw new RuntimeException("Erro salvando arquivo no S3 ", e);
 			} catch(Exception e) {
-				usuarioServico.apagarNomeAudio(name);
+				usuarioRepositorio.apagarNomeAudio(name);
 				LOGGER.error(e.getMessage());
 				throw new RuntimeException(e);
 			}
@@ -80,8 +80,14 @@ public class AudioStorageS3 implements AudioStorage {
 	public void excluir(String audio) {
 		if(Strings.isEmpty(audio)) {
 			return;
-		}		
-		amazonS3.deleteObjects(new DeleteObjectsRequest(BUCKET).withKeys(audio));
+		}	
+		
+		try {			
+			amazonS3.deleteObjects(new DeleteObjectsRequest(BUCKET).withKeys(audio));
+		}
+		catch(Exception e) {
+			LOGGER.error("Erro ao deletar arquivo no S3", e);
+		}
 	}
 
 	@Override

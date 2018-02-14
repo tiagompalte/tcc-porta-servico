@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.repositorio.Parametros;
-import br.com.utfpr.porta.servico.UsuarioServico;
+import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.storage.AudioStorage;
 
 @Component
@@ -27,7 +27,7 @@ public class AudioStorageLocal implements AudioStorage {
 	private Path local;
 	
 	@Autowired
-	private UsuarioServico usuarioServico;
+	private Usuarios usuarioRepositorio;
 	
 	@Autowired
 	private Parametros parametroRepositorio;
@@ -56,10 +56,10 @@ public class AudioStorageLocal implements AudioStorage {
 				Files.deleteIfExists(this.local.resolve(name));
 				file.transferTo(new File(this.local.toAbsolutePath().toString() + getDefault().getSeparator() + name));
 			} catch (IOException e) {
-				usuarioServico.apagarNomeAudio(name);
+				usuarioRepositorio.apagarNomeAudio(name);
 				throw new RuntimeException("Erro ao salvar o áudio. ", e);
 			} catch(Exception e) {
-				usuarioServico.apagarNomeAudio(name);
+				usuarioRepositorio.apagarNomeAudio(name);
 				throw new RuntimeException("Erro ao salvar o áudio. ", e);
 			}
 		}
