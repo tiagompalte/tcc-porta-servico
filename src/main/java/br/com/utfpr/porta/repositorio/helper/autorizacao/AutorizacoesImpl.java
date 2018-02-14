@@ -105,17 +105,18 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 			localDateTimeAtual = LocalDateTime.now().minusDays(1);
 		}
 		else {
-			localDateTimeAtual = LocalDateTime.ofInstant(dataHoraAtual.toInstant(), 
-									ZoneId.from(dataHoraAtual.toInstant())).minusDays(1);
+			localDateTimeAtual = LocalDateTime.ofInstant(dataHoraAtual.toInstant(), ZoneId.systemDefault()).minusDays(1);			
 		}
-						
-		CriteriaBuilder cb = manager.getCriteriaBuilder();
-		CriteriaDelete<Autorizacao> delete = cb.createCriteriaDelete(Autorizacao.class);
-		Root<Autorizacao> autorizacao = delete.getRoot();
-		delete.where(cb.and(
-				cb.equal(autorizacao.get("tipoAutorizacao"), TipoAutorizacao.TEMPORARIO.name()),
-				cb.lessThan(autorizacao.get("dataHoraFim"), localDateTimeAtual)));
-		manager.createQuery(delete).executeUpdate();		
+		
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		CriteriaDelete<Autorizacao> criteria = builder.createCriteriaDelete(Autorizacao.class);
+		Root<Autorizacao> root = criteria.from(Autorizacao.class);
+
+		criteria.where(builder.and(
+				builder.equal(root.<TipoAutorizacao>get("tipoAutorizacao"), TipoAutorizacao.TEMPORARIO), 
+				builder.lessThan(root.<LocalDateTime>get("dataHoraFim"), localDateTimeAtual)));
+		
+		this.manager.createQuery(criteria).executeUpdate();		
 	}
 	
 }
