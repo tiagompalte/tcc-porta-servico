@@ -1,5 +1,7 @@
 package br.com.utfpr.porta.servico;
 
+import java.util.List;
+
 import javax.persistence.PersistenceException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.utfpr.porta.modelo.Endereco;
 import br.com.utfpr.porta.modelo.Estabelecimento;
+import br.com.utfpr.porta.modelo.Log;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Enderecos;
 import br.com.utfpr.porta.repositorio.Estabelecimentos;
+import br.com.utfpr.porta.repositorio.Logs;
 import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.EnderecoJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
@@ -30,6 +34,9 @@ public class EstabelecimentoServico {
 	
 	@Autowired
 	private Usuarios usuarioRepositorio;
+	
+	@Autowired
+	private Logs logRepositorio;
 	
 	@Transactional
 	public void salvar(Estabelecimento estabelecimento) {
@@ -123,6 +130,18 @@ public class EstabelecimentoServico {
 			}
 			catch(PersistenceException e) {
 				throw new ImpossivelExcluirEntidadeException("Erro ao excluir responsável do estabelecimento");
+			}
+		}
+		
+		//Excluir os logs
+		List<Log> listaLogs = logRepositorio.findByEstabelecimento(estabelecimento);
+		if(listaLogs != null && listaLogs.isEmpty() == false) {			
+			try {
+				logRepositorio.deleteInBatch(listaLogs);
+				logRepositorio.flush();
+			}
+			catch(PersistenceException e) {
+				throw new ImpossivelExcluirEntidadeException("Erro ao excluir logs do estabelecimento");
 			}
 		}
 		
