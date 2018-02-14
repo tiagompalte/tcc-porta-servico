@@ -17,8 +17,6 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import br.com.utfpr.porta.validacao.DiaMes;
-
 @Entity
 @Table(name = "autorizacao")
 public class Autorizacao implements Serializable {
@@ -37,7 +35,6 @@ public class Autorizacao implements Serializable {
 	@Column(name = "dia_semana")
 	private DiaSemana diaSemana;
 	
-	@DiaMes
 	@Column(name = "dia_mes")
 	private Integer diaMes;
 			
