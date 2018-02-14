@@ -5,8 +5,6 @@ import java.util.Optional;
 import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.util.Strings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,7 @@ import br.com.utfpr.porta.servico.excecao.EmailUsuarioJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
 import br.com.utfpr.porta.servico.excecao.RfidUsuarioJaCadastradoExcecao;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
+import br.com.utfpr.porta.storage.AudioStorage;
 
 @Service
 public class UsuarioServico {
@@ -40,8 +39,9 @@ public class UsuarioServico {
 	@Autowired
 	private Parametros parametroRepositorio;
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(UsuarioServico.class);
-	
+	@Autowired
+	private AudioStorage audioStorage;
+		
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
 		
@@ -167,36 +167,26 @@ public class UsuarioServico {
 			throw new NullPointerException("Código do usuário não informado");
 		}
 		
+		Usuario usuario = usuariosRepositorio.findOne(codigo);
+		
+		if(usuario == null) {
+			throw new ImpossivelExcluirEntidadeException("Usuário não encontrado na base de dados");
+		}
+		
 		try {
-			usuariosRepositorio.delete(codigo);
+			usuariosRepositorio.delete(usuario);
 			usuariosRepositorio.flush();
 		}
 		catch(PersistenceException e) {
 			throw new ImpossivelExcluirEntidadeException("Impossível apagar usuário. Ele possui autorizações relacionadas.");
 		}
 		
-	}
-	
-	@Transactional
-	public void apagarNomeAudio(String nomeAudio) {
-		
-		if(Strings.isEmpty(nomeAudio)) {
-			return;
+		if(Strings.isEmpty(usuario.getNomeAudio()) == false) {
+			audioStorage.excluir(usuario.getNomeAudio());
 		}
 		
-		try {
-			Optional<Usuario> usuario = usuariosRepositorio.findByNomeAudio(nomeAudio);
-			
-			if(usuario.isPresent()) {
-				usuario.get().setNomeAudio(null);
-				usuariosRepositorio.save(usuario.get());
-			}			
-		}
-		catch(Exception e) {
-			LOGGER.error("Não foi possível apagar nome do áudio ", e);
-		}
 	}
-	
+		
 	@Transactional
 	public String incrementarNrTentativaAcessoPorta(Long codigoUsuario) {
 		
