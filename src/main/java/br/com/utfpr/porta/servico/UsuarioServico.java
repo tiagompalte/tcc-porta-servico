@@ -196,7 +196,7 @@ public class UsuarioServico {
 		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
 		
 		if(usuario == null) {
-			throw new NullPointerException("Usuário não encotrado");
+			throw new NullPointerException("Usuário não encontrado");
 		}
 		
 		Integer nrTentativaAtual = usuario.incrementarNrTentativaAcessoPorta(1);
@@ -230,7 +230,7 @@ public class UsuarioServico {
 		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
 		
 		if(usuario == null) {
-			throw new NullPointerException("Usuário não encotrado");
+			throw new NullPointerException("Usuário não encontrado");
 		}
 		
 		usuario.setNrTentativaAcessoPorta(0);
@@ -248,7 +248,7 @@ public class UsuarioServico {
 		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
 		
 		if(usuario == null) {
-			throw new NullPointerException("Usuário não encotrado");
+			throw new NullPointerException("Usuário não encontrado");
 		}
 		
 		Integer nrTentativaAtual = usuario.incrementarNrTentativaAcessoSite(1);
@@ -282,7 +282,7 @@ public class UsuarioServico {
 		Usuario usuario = usuariosRepositorio.findOne(codigoUsuario);
 		
 		if(usuario == null) {
-			throw new NullPointerException("Usuário não encotrado");
+			throw new NullPointerException("Usuário não encontrado");
 		}
 		
 		usuario.setNrTentativaAcessoSite(0);
