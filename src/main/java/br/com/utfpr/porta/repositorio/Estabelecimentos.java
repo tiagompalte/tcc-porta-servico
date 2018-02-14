@@ -9,9 +9,7 @@ import br.com.utfpr.porta.repositorio.helper.estabelecimento.EstabelecimentosQue
 
 @Repository
 public interface Estabelecimentos extends JpaRepository<Estabelecimento, Long>, EstabelecimentosQueries {
-	
-	public Estabelecimento findByCodigo(Long codigo);
-	
+		
 	public Estabelecimento findByResponsavel(Usuario usuario);
 
 }

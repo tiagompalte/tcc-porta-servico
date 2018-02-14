@@ -91,11 +91,39 @@ public class EstabelecimentoServico {
 				
 	}
 	
-	@Transactional
+	@Transactional(rollbackFor={ImpossivelExcluirEntidadeException.class,NullPointerException.class,Exception.class})
 	public void excluir(Long codigo) {
 		
 		if(codigo == null) {
 			throw new NullPointerException("Código do estabelecimento não informado");
+		}
+		
+		Estabelecimento estabelecimento = estabelecimentosRepositorio.findOne(codigo);
+		
+		if(estabelecimento == null) {
+			throw new ImpossivelExcluirEntidadeException("Estabelecimento não encontrado na base de dados");
+		}
+		
+		//Excluir endereço
+		if(estabelecimento.getEndereco() != null) {			
+			try {
+				enderecosRespositorio.delete(estabelecimento.getEndereco());
+				enderecosRespositorio.flush();
+			}
+			catch(PersistenceException e) {
+				throw new ImpossivelExcluirEntidadeException("Erro ao excluir endereço do estabelecimento");
+			}
+		}
+		
+		//Excluir responsável
+		if(estabelecimento.getResponsavel() != null) {
+			try {
+				usuarioRepositorio.delete(estabelecimento.getResponsavel());
+				usuarioRepositorio.flush();
+			}
+			catch(PersistenceException e) {
+				throw new ImpossivelExcluirEntidadeException("Erro ao excluir responsável do estabelecimento");
+			}
 		}
 		
 		try {
@@ -103,7 +131,7 @@ public class EstabelecimentoServico {
 			estabelecimentosRepositorio.flush();
 		}
 		catch(PersistenceException e) {
-			throw new ImpossivelExcluirEntidadeException("Impossível excluir estabelecimento. Ele está vinculado a usuários, portas e autorizações");
+			throw new ImpossivelExcluirEntidadeException("Impossível excluir estabelecimento. Ele está vinculado a portas e autorizações");
 		}
 		
 	}
