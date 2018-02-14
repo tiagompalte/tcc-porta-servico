@@ -54,21 +54,23 @@ public class UsuarioServico {
 			throw new EmailUsuarioJaCadastradoExcecao("E-mail já cadastrado");
 		}
 		
+		Usuario usuarioBase = null;
+		if(!usuario.isNovo()) {
+			usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
+		}
+		
 		if(Strings.isEmpty(usuario.getSenhaSite())) {
 			if (usuario.isNovo()) {
 				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
 			}
-			else {
-				Usuario usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
-				if(usuarioBase != null) {
-					usuario.setSenhaSite(usuarioBase.getSenhaSite());
-					usuario.setConfirmacaoSenhaSite(usuarioBase.getSenhaSite());					
-				}
+			else if(usuarioBase != null) {
+				usuario.setSenhaSite(usuarioBase.getSenhaSite());
+				usuario.setConfirmacaoSenhaSite(usuarioBase.getSenhaSite());
 			}			
 		}
 		else {			
-			if(usuario.getSenhaSite().length() < 6 || usuario.getSenhaSite().length() > 12) {
-				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site deve ter entre 6 e 12 caracteres");
+			if(usuario.getSenhaSite().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%!^&*]).{6,12}$") == false) {
+				throw new CampoNaoInformadoExcecao("senhaSite", "A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 dígitos");
 			}
 			usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
 			usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());			
@@ -111,12 +113,9 @@ public class UsuarioServico {
 						if (usuario.isNovo()) {
 							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
 						}
-						else {
-							Usuario usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
-							if(usuarioBase != null) {							
-								usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
-								usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());
-							}
+						else if(usuarioBase != null) {							
+							usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
+							usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());							
 						}
 					}
 					else {					

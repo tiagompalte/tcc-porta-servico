@@ -24,7 +24,6 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import br.com.utfpr.porta.validacao.AtributoConfirmacao;
-import br.com.utfpr.porta.validacao.SenhaSite;
 
 @Entity
 @Table(name = "usuario")
@@ -50,7 +49,6 @@ public class Usuario implements Serializable {
 	
 	private Boolean ativo;
 	
-	@SenhaSite
 	@Column(name = "senha_site")
 	private String senhaSite;
 	
@@ -88,7 +86,7 @@ public class Usuario implements Serializable {
 	
 	@Column(name = "nr_tentativa_acesso_site")
 	private Integer nrTentativaAcessoSite;
-			
+				
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
