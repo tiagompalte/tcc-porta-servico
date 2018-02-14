@@ -116,7 +116,7 @@ public class UsuariosImpl implements UsuariosQueries {
 		CriteriaUpdate<Usuario> criteria = builder.createCriteriaUpdate(Usuario.class);
 		Root<Usuario> root = criteria.from(Usuario.class);
 
-		criteria.set("nomeAudio", true)
+		criteria.set("nomeAudio", null)
 			.where(builder.lessThan(root.<String>get("nomeAudio"), nomeAudio));
 		
 		return this.manager.createQuery(criteria).executeUpdate();
