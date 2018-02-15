@@ -2,6 +2,7 @@ package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -10,12 +11,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "anuncio")
@@ -27,21 +31,37 @@ public class Anuncio implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 	
 	@Size(min = 5, max = 200, message = "Descrição deve ter entre 5 e 200 caracteres")
 	private String descricao;
 	
+	@Size(min = 1, max = 50, message = "Descrição resumida deve ter até 50 caracteres")
+	@Column(name = "descricao_resumida")
+	private String descricaoResumida;
+	
 	@NotNull(message = "Informe um preço")
 	private BigDecimal preco;
+		
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@Column(name = "data_publicacao")
+	private LocalDate dataPublicacao;
 	
-	@Column(name = "data_hora_criacao")
+	@NotNull(message = "Informe uma data de expiração")
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@Column(name = "data_expiracao")
+	private LocalDate dataExpiracao;
+		
+	@Column(name = "data_hora_criacao", updatable=false)
 	private LocalDateTime dataHoraCriacao;
 	
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
+	
+	@Transient
+	private Long qtdeInteressados;
 	
 	@PrePersist
 	private void prePersist() {
@@ -52,6 +72,10 @@ public class Anuncio implements Serializable {
 	@PreUpdate
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	public boolean isNovo() {
+		return codigo == null;
 	}
 
 	public Long getCodigo() {
@@ -77,6 +101,14 @@ public class Anuncio implements Serializable {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
+	
+	public String getDescricaoResumida() {		
+		return descricaoResumida;
+	}
+	
+	public void setDescricaoResumida(String descricaoResumida) {
+		this.descricaoResumida = descricaoResumida;
+	}
 
 	public BigDecimal getPreco() {
 		return preco;
@@ -85,7 +117,43 @@ public class Anuncio implements Serializable {
 	public void setPreco(BigDecimal preco) {
 		this.preco = preco;
 	}
+		
+	public LocalDate getDataExpiracao() {
+		return dataExpiracao;
+	}
 
+	public void setDataExpiracao(LocalDate dataExpiracao) {
+		this.dataExpiracao = dataExpiracao;
+	}
+		
+	public LocalDate getDataPublicacao() {
+		return dataPublicacao;
+	}
+
+	public void setDataPublicacao(LocalDate dataPublicacao) {
+		this.dataPublicacao = dataPublicacao;
+	}
+	
+	public boolean isExpirado() {
+		if(dataExpiracao == null) {
+			return false;
+		}
+		
+		return dataExpiracao.isBefore(LocalDate.now());
+	}
+
+	public String getExpiradoDescricao() {
+		return (isExpirado() ? "Sim" : "Não");
+	}
+	
+	public Long getQtdeInteressados() {
+		return qtdeInteressados;
+	}
+
+	public void setQtdeInteressados(Long qtdeInteressados) {
+		this.qtdeInteressados = qtdeInteressados;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
