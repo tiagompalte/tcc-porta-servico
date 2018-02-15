@@ -65,6 +65,11 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 	}
 		
 	private Long quantidadePortasPorEstabelecimento(Long codigo_estabelecimento) {
+		
+		if(codigo_estabelecimento == null) {
+			throw new NullPointerException("Código do estabelecimento não informado");
+		}
+		
 		return manager
 				.createQuery("select count(*) from Porta where codigo_estabelecimento = :codigo", Long.class)
 				.setParameter("codigo", codigo_estabelecimento)
