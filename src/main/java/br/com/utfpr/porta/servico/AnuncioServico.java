@@ -13,8 +13,6 @@ import br.com.utfpr.porta.modelo.Anuncio;
 import br.com.utfpr.porta.modelo.AnuncioUsuario;
 import br.com.utfpr.porta.modelo.AnuncioUsuarioId;
 import br.com.utfpr.porta.modelo.Usuario;
-import br.com.utfpr.porta.repositorio.AnuncioUsuarios;
-import br.com.utfpr.porta.repositorio.Anuncios;
 import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
 import br.com.utfpr.porta.servico.excecao.InformacaoInvalidaException;
@@ -24,10 +22,10 @@ import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 public class AnuncioServico {
 	
 	@Autowired
-	private Anuncios anuncioRepositorio;
+	private br.com.utfpr.porta.repositorio.Anuncio anuncioRepositorio;
 		
 	@Autowired
-	private AnuncioUsuarios anuncioUsuarioRepositorio;
+	private br.com.utfpr.porta.repositorio.AnuncioUsuario anuncioUsuarioRepositorio;
 	
 	@Autowired
 	private Usuarios usuariosRepositorio;
@@ -39,13 +37,18 @@ public class AnuncioServico {
 			throw new NullPointerException("Anúncio não informado");
 		}
 		
+		Anuncio anuncioBase = null;
+		if(anuncio.isNovo() == false) {
+			anuncioBase = anuncioRepositorio.findOne(anuncio.getCodigo());
+		}
+		
 		if(anuncio.getEstabelecimento() == null || anuncio.getEstabelecimento().getCodigo() == null) {
 			throw new CampoNaoInformadoExcecao("estabelecimento", "Estabelecimento não informado");
 		}
 		
-		if(anuncio.getPreco().compareTo(BigDecimal.ZERO) <= 0) {
-			throw new InformacaoInvalidaException("preco", "Valor não pode ser menor igual a zero");
-		}
+//		if(anuncio.getPreco().compareTo(BigDecimal.ZERO) <= 0) {
+//			throw new InformacaoInvalidaException("preco", "Valor não pode ser menor igual a zero");
+//		}
 		
 		if(anuncio.getDataExpiracao() == null) {
 			throw new CampoNaoInformadoExcecao("dataExpiracao", "Informe uma data de expiração do anúncio");
@@ -54,11 +57,16 @@ public class AnuncioServico {
 			throw new CampoNaoInformadoExcecao("dataExpiracao", "Informe uma data de expiração posterior a data atual");
 		}
 		
-		if(anuncio.getDataPublicacao() == null) {
-			throw new CampoNaoInformadoExcecao("dataPublicacao", "Informe uma data de publicação do anúncio");
+		if(anuncio.isNovo()) {			
+			if(anuncio.getDataPublicacao() == null) {
+				throw new CampoNaoInformadoExcecao("dataPublicacao", "Informe uma data de publicação do anúncio");
+			}
+			else if(anuncio.getDataPublicacao().isAfter(LocalDate.now())) {
+				throw new CampoNaoInformadoExcecao("dataPublicacao", "Informe uma data de publicação anterior a data atual");
+			}
 		}
-		else if(anuncio.getDataPublicacao().isAfter(LocalDate.now())) {
-			throw new CampoNaoInformadoExcecao("dataPublicacao", "Informe uma data de publicação anterior a data atual");
+		else {
+			anuncio.setDataPublicacao(anuncioBase.getDataPublicacao());
 		}
 				
 		anuncioRepositorio.save(anuncio);
@@ -95,16 +103,10 @@ public class AnuncioServico {
 	}
 	
 	@Transactional(rollbackFor={ValidacaoBancoDadosExcecao.class,NullPointerException.class})
-	public void excluir(Long codigo_anuncio) {
+	public void excluir(Anuncio anuncio) {
 		
-		if(codigo_anuncio == null) {
-			throw new NullPointerException("Código do anúncio não informado");
-		}
-		
-		Anuncio anuncio = anuncioRepositorio.findOne(codigo_anuncio);
-		
-		if(anuncio == null) {
-			throw new ValidacaoBancoDadosExcecao("Anúncio não encontrado na base de dados");
+		if(anuncio == null || anuncio.getCodigo() == null) {
+			throw new NullPointerException("Anúncio não informado");
 		}
 		
 		anuncioUsuarioRepositorio.excluirPorAnuncio(anuncio);

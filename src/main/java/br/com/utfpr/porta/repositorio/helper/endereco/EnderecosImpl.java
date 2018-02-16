@@ -8,7 +8,7 @@ import javax.persistence.PersistenceContext;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.transaction.annotation.Transactional;
 
-public class EnderecoImpl implements EnderecoQueries {
+public class EnderecosImpl implements EnderecosQueries {
 	
 	@PersistenceContext
 	private EntityManager manager;

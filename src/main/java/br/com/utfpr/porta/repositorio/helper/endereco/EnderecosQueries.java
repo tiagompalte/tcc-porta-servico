@@ -2,7 +2,7 @@ package br.com.utfpr.porta.repositorio.helper.endereco;
 
 import java.util.List;
 
-public interface EnderecoQueries {
+public interface EnderecosQueries {
 	
 	public List<String> obterEstados();
 	

@@ -11,7 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -20,6 +20,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import br.com.utfpr.porta.modelo.serializacao.LocalDateSerializador;
 
 @Entity
 @Table(name = "anuncio")
@@ -31,7 +35,7 @@ public class Anuncio implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long codigo;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "codigo_estabelecimento")
 	private Estabelecimento estabelecimento;
 	
@@ -42,15 +46,17 @@ public class Anuncio implements Serializable {
 	@Column(name = "descricao_resumida")
 	private String descricaoResumida;
 	
-	@NotNull(message = "Informe um preço")
-	private BigDecimal preco;
+//	@NotNull(message = "Informe um preço")
+//	private BigDecimal preco;
 		
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@JsonSerialize(using = LocalDateSerializador.class)
 	@Column(name = "data_publicacao")
 	private LocalDate dataPublicacao;
 	
 	@NotNull(message = "Informe uma data de expiração")
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	@JsonSerialize(using = LocalDateSerializador.class)
 	@Column(name = "data_expiracao")
 	private LocalDate dataExpiracao;
 		
@@ -62,6 +68,10 @@ public class Anuncio implements Serializable {
 	
 	@Transient
 	private Long qtdeInteressados;
+	
+	public Anuncio() {
+		this.dataPublicacao = LocalDate.now();
+	}
 	
 	@PrePersist
 	private void prePersist() {
@@ -110,13 +120,13 @@ public class Anuncio implements Serializable {
 		this.descricaoResumida = descricaoResumida;
 	}
 
-	public BigDecimal getPreco() {
-		return preco;
-	}
-
-	public void setPreco(BigDecimal preco) {
-		this.preco = preco;
-	}
+//	public BigDecimal getPreco() {
+//		return preco;
+//	}
+//
+//	public void setPreco(BigDecimal preco) {
+//		this.preco = preco;
+//	}
 		
 	public LocalDate getDataExpiracao() {
 		return dataExpiracao;

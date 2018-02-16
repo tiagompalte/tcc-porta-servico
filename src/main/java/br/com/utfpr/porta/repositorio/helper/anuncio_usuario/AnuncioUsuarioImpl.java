@@ -38,16 +38,4 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 		}
 	}
 	
-	@Transactional(readOnly=true)
-	public Long obterQtdeUsuariosInteressadosPorAnuncio(Long codigo_anuncio) {
-		
-		if(codigo_anuncio == null) {
-			throw new NullPointerException("Código do anúncio não informado");
-		}
-		
-		return manager
-				.createQuery("select count(*) from anuncio_usuario where codigo_anuncio = :codigo", Long.class)
-				.setParameter("codigo", codigo_anuncio)
-				.getSingleResult();		
-	}
 }
