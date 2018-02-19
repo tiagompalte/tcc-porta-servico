@@ -84,7 +84,7 @@ public class AnuncioImpl implements AnuncioQueries {
 		}
 		
 		return manager
-				.createQuery("select count(*) from anuncio_usuario where codigo_anuncio = :codigo", Long.class)
+				.createQuery("select count(*) from AnuncioUsuario where codigo_anuncio = :codigo", Long.class)
 				.setParameter("codigo", codigo_anuncio)
 				.getSingleResult();		
 	}
