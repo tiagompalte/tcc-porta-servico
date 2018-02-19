@@ -11,10 +11,7 @@ CREATE TABLE anuncio_usuario (
 ALTER TABLE anuncio ADD COLUMN data_expiracao DATE NOT NULL;
 ALTER TABLE anuncio ADD COLUMN data_publicacao DATE NOT NULL;
 ALTER TABLE anuncio ADD COLUMN descricao_resumida VARCHAR(50) NOT NULL;
+ALTER TABLE anuncio ADD COLUMN preco DECIMAL(10,2) NOT NULL;
 
-INSERT INTO permissao values (13, 'ROLE_CADASTRAR_ANUNCIO', now(), now());
-INSERT INTO permissao values (14, 'ROLE_VISUALIZAR_ANUNCIO', now(), now());
-
-INSERT INTO grupo_permissao values (1, 13);
-INSERT INTO grupo_permissao values (2, 13);
-INSERT INTO grupo_permissao values (3, 14);
+DELETE FROM grupo_permissao WHERE codigo_grupo = 1 AND codigo_permissao = 6;
+DELETE FROM grupo_permissao WHERE codigo_grupo = 2 AND codigo_permissao = 6;
