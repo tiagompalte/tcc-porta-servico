@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -46,8 +49,10 @@ public class Anuncio implements Serializable {
 	@Column(name = "descricao_resumida")
 	private String descricaoResumida;
 	
-//	@NotNull(message = "Informe um preço")
-//	private BigDecimal preco;
+	@NotNull(message = "Informe um preço")
+	@DecimalMin(value = "0.01", message = "O valor do anúncio deve ser maior que R$0,01")
+	@DecimalMax(value = "9999999.99", message = "O valor do anúncio deve ser menor que R$9.999.999,99")
+	private BigDecimal preco;
 		
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	@JsonSerialize(using = LocalDateSerializador.class)
@@ -120,13 +125,13 @@ public class Anuncio implements Serializable {
 		this.descricaoResumida = descricaoResumida;
 	}
 
-//	public BigDecimal getPreco() {
-//		return preco;
-//	}
-//
-//	public void setPreco(BigDecimal preco) {
-//		this.preco = preco;
-//	}
+	public BigDecimal getPreco() {
+		return preco;
+	}
+
+	public void setPreco(BigDecimal preco) {
+		this.preco = preco;
+	}
 		
 	public LocalDate getDataExpiracao() {
 		return dataExpiracao;
@@ -142,6 +147,14 @@ public class Anuncio implements Serializable {
 
 	public void setDataPublicacao(LocalDate dataPublicacao) {
 		this.dataPublicacao = dataPublicacao;
+	}
+	
+	public String getDataPublicacaoString() {
+		if(dataPublicacao == null) {
+			return "";
+		}
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		return formatador.format(dataPublicacao);
 	}
 	
 	public boolean isExpirado() {

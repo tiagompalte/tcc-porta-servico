@@ -46,9 +46,9 @@ public class AnuncioServico {
 			throw new CampoNaoInformadoExcecao("estabelecimento", "Estabelecimento não informado");
 		}
 		
-//		if(anuncio.getPreco().compareTo(BigDecimal.ZERO) <= 0) {
-//			throw new InformacaoInvalidaException("preco", "Valor não pode ser menor igual a zero");
-//		}
+		if(anuncio.getPreco().compareTo(BigDecimal.ZERO) <= 0) {
+			throw new InformacaoInvalidaException("preco", "Valor não pode ser menor igual a zero");
+		}
 		
 		if(anuncio.getDataExpiracao() == null) {
 			throw new CampoNaoInformadoExcecao("dataExpiracao", "Informe uma data de expiração do anúncio");
@@ -89,6 +89,10 @@ public class AnuncioServico {
 			throw new NullPointerException("Anúncio não encontrado na base de dados");
 		}
 		
+		if(anuncio.isExpirado()) {
+			throw new ValidacaoBancoDadosExcecao("Anúncio expirado");
+		}
+		
 		Usuario usuario = usuariosRepositorio.findOne(codigo_usuario);
 		
 		if(usuario == null) {
@@ -99,6 +103,23 @@ public class AnuncioServico {
 		AnuncioUsuario anuncio_usuario = new AnuncioUsuario(id);
 		
 		anuncioUsuarioRepositorio.save(anuncio_usuario);
+		
+	}
+	
+	@Transactional(rollbackFor=NullPointerException.class)
+	public void expirarAnuncio(Anuncio anuncio, LocalDate dataAtual) {
+		
+		if(anuncio == null) {
+			throw new NullPointerException("Anúncio não informado");
+		}
+		
+		if(dataAtual == null) {
+			dataAtual = LocalDate.now();
+		}
+		
+		anuncio.setDataPublicacao(dataAtual);
+		
+		anuncioRepositorio.save(anuncio);
 		
 	}
 	
