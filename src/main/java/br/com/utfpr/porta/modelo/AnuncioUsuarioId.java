@@ -22,6 +22,8 @@ public class AnuncioUsuarioId implements Serializable {
 	@JoinColumn(name = "codigo_anuncio")
 	private Anuncio anuncio;
 	
+	public AnuncioUsuarioId() {}
+	
 	public AnuncioUsuarioId(Usuario usuario, Anuncio anuncio) {
 		super();
 		this.usuario = usuario;

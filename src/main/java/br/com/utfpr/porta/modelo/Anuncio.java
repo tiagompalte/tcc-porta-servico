@@ -76,6 +76,9 @@ public class Anuncio implements Serializable {
 	@Transient
 	private Long qtdeInteressados;
 	
+	@Transient
+	private boolean usuarioJaInteressado;
+	
 	public Anuncio() {
 		this.dataPublicacao = LocalDate.now();
 	}
@@ -205,6 +208,14 @@ public class Anuncio implements Serializable {
 		this.qtdeInteressados = qtdeInteressados;
 	}
 	
+	public boolean isUsuarioJaInteressado() {
+		return usuarioJaInteressado;
+	}
+
+	public void setUsuarioJaInteressado(boolean usuarioJaInteressado) {
+		this.usuarioJaInteressado = usuarioJaInteressado;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

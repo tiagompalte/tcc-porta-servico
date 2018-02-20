@@ -105,9 +105,9 @@ public class UsuarioServico {
 						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 					}
 					
-					if(Strings.isEmpty(usuario.getNomeAudio())) {
-						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-					}
+//					if(Strings.isEmpty(usuario.getNomeAudio())) {
+//						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
+//					}
 					
 					if(Strings.isEmpty(usuario.getSenhaTeclado())) {
 						if (usuario.isNovo()) {

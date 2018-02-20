@@ -8,6 +8,7 @@ public class AnuncioUsuarioFiltro {
 	private String cidade;
 	private BigDecimal faixaPrecoInicial;
 	private BigDecimal faixaPrecoFinal;
+	private Long codigoUsuario;
 	
 	public String getEstado() {
 		return estado;
@@ -32,6 +33,12 @@ public class AnuncioUsuarioFiltro {
 	}
 	public void setFaixaPrecoFinal(BigDecimal faixaPrecoFinal) {
 		this.faixaPrecoFinal = faixaPrecoFinal;
+	}
+	public Long getCodigoUsuario() {
+		return codigoUsuario;
+	}
+	public void setCodigoUsuario(Long codigoUsuario) {
+		this.codigoUsuario = codigoUsuario;
 	}
 	
 }

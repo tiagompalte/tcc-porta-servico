@@ -94,6 +94,12 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		List<Anuncio> filtrados = criteria.list();
+		
+		if(filtrados != null && filtrados.isEmpty() == false) {
+			for(Anuncio anuncio : filtrados) {
+				anuncio.setUsuarioJaInteressado(verificarInteresse(anuncio.getCodigo(), filtro.getCodigoUsuario()));
+			}
+		}
 				
 		return new PageImpl<Anuncio>(filtrados, pageable, total(filtro));
 	}
@@ -133,6 +139,17 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 			}
 			
 		}
+	}
+	
+	private boolean verificarInteresse(Long codigoAnuncio, Long codigoUsuario) {
+		
+		Long count = manager.createQuery(
+				"select count(*) from AnuncioUsuario where id.anuncio.codigo = :anuncio and id.usuario.codigo = :usuario", Long.class)
+				.setParameter("anuncio", codigoAnuncio)
+				.setParameter("usuario", codigoUsuario)
+				.getSingleResult();
+		
+		return count > 0;
 	}
 	
 }

@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.utfpr.porta.modelo.Anuncio;
-import br.com.utfpr.porta.modelo.AnuncioUsuario;
-import br.com.utfpr.porta.modelo.AnuncioUsuarioId;
-import br.com.utfpr.porta.modelo.Usuario;
-import br.com.utfpr.porta.repositorio.Usuarios;
 import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
 import br.com.utfpr.porta.servico.excecao.InformacaoInvalidaException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
@@ -26,10 +22,7 @@ public class AnuncioServico {
 		
 	@Autowired
 	private br.com.utfpr.porta.repositorio.AnuncioUsuario anuncioUsuarioRepositorio;
-	
-	@Autowired
-	private Usuarios usuariosRepositorio;
-	
+		
 	@Transactional
 	public void salvar(Anuncio anuncio) {
 		
@@ -71,41 +64,7 @@ public class AnuncioServico {
 				
 		anuncioRepositorio.save(anuncio);
 	}
-	
-	@Transactional
-	public void adicionarUsuarioInteressado(Long codigo_anuncio, Long codigo_usuario) {
 		
-		if(codigo_anuncio == null) {
-			throw new NullPointerException("Código do anúncio não informado");
-		}
-		
-		if(codigo_usuario == null) {
-			throw new NullPointerException("Código do usuário não informado");
-		}
-		
-		Anuncio anuncio = anuncioRepositorio.findOne(codigo_anuncio);
-		
-		if(anuncio == null) {
-			throw new NullPointerException("Anúncio não encontrado na base de dados");
-		}
-		
-		if(anuncio.isExpirado()) {
-			throw new ValidacaoBancoDadosExcecao("Anúncio expirado");
-		}
-		
-		Usuario usuario = usuariosRepositorio.findOne(codigo_usuario);
-		
-		if(usuario == null) {
-			throw new NullPointerException("Usuário não encontrado na base de dados");
-		}
-		
-		AnuncioUsuarioId id = new AnuncioUsuarioId(usuario, anuncio);
-		AnuncioUsuario anuncio_usuario = new AnuncioUsuario(id);
-		
-		anuncioUsuarioRepositorio.save(anuncio_usuario);
-		
-	}
-	
 	@Transactional(rollbackFor=NullPointerException.class)
 	public void expirarAnuncio(Anuncio anuncio, LocalDate dataAtual) {
 		

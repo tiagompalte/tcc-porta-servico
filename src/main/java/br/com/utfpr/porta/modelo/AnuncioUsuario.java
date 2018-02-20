@@ -36,6 +36,8 @@ public class AnuncioUsuario implements Serializable {
 		this.dataHoraAlteracao = LocalDateTime.now();
 	}
 	
+	public AnuncioUsuario() {}
+	
 	public AnuncioUsuario(AnuncioUsuarioId id) {
 		super();
 		this.id = id;
