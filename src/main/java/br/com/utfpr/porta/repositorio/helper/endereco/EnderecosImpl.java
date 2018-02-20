@@ -25,7 +25,7 @@ public class EnderecosImpl implements EnderecosQueries {
 			throw new NullPointerException("Estado não informado");
 		}
 		
-		return manager.createQuery("SELECT cidade FROM Endereco GROUP BY cidade WHERE estado = ?", String.class)
+		return manager.createQuery("SELECT cidade FROM Endereco WHERE estado = ? GROUP BY cidade", String.class)
 				.setParameter(1, estado.toUpperCase()).getResultList();
 	}
 

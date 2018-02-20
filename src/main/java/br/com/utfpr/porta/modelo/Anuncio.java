@@ -2,9 +2,11 @@ package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -132,7 +134,14 @@ public class Anuncio implements Serializable {
 	public void setPreco(BigDecimal preco) {
 		this.preco = preco;
 	}
-		
+	
+	public String getPrecoString() {
+		if(preco == null) {
+			return "";
+		}
+		return NumberFormat.getCurrencyInstance().format(preco);
+	}
+			
 	public LocalDate getDataExpiracao() {
 		return dataExpiracao;
 	}
@@ -167,6 +176,25 @@ public class Anuncio implements Serializable {
 
 	public String getExpiradoDescricao() {
 		return (isExpirado() ? "Sim" : "Não");
+	}
+	
+	public String getTempoExpiracao() {
+		if(dataExpiracao == null) {
+			return "";
+		}
+		
+		long dias = LocalDate.now().until(dataExpiracao, ChronoUnit.DAYS);
+		
+		if(dias == 0) {
+			return "Hoje";
+		}
+		else if(dias == 1) {
+			return "Amanhã";
+		}
+		else if(dias < 0) {
+			return "Expirado";
+		}
+		return String.valueOf(dias).concat(" dias");
 	}
 	
 	public Long getQtdeInteressados() {

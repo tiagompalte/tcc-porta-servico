@@ -1,5 +1,6 @@
 package br.com.utfpr.porta.repositorio.helper.anuncio_usuario;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,6 +89,8 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 		}
 		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Anuncio.class);
+		criteria.createAlias("estabelecimento", "est");
+		criteria.createAlias("est.endereco", "end");
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		List<Anuncio> filtrados = criteria.list();
@@ -97,13 +100,20 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 	
 	private Long total(AnuncioUsuarioFiltro filtro) {
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Anuncio.class);
+		criteria.createAlias("estabelecimento", "est");
+		criteria.createAlias("est.endereco", "end");
 		adicionarFiltro(filtro, criteria);
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}
 
 	private void adicionarFiltro(AnuncioUsuarioFiltro filtro, Criteria criteria) {				
+		
 		if (filtro != null) {
+			
+			//NÃO BUSCAR POR ANÚNCIOS EXPIRADOS
+			criteria.add(Restrictions.ge("dataExpiracao", LocalDate.now()));
+			
 			if(filtro.getFaixaPrecoInicial() != null && filtro.getFaixaPrecoFinal() != null) {
 				criteria.add(Restrictions.between("preco", filtro.getFaixaPrecoInicial(), filtro.getFaixaPrecoFinal()));
 			}
@@ -114,12 +124,14 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 				criteria.add(Restrictions.le("preco", filtro.getFaixaPrecoFinal()));
 			}
 			
-			if(Strings.isNotEmpty(filtro.getCidade()) && Strings.isNotEmpty(filtro.getEstado())) {
-				//IMPLEMENTAR COM ALIAS
-				criteria.add(Restrictions.and(
-						Restrictions.eq("estabelecimento.endereco.cidade", filtro.getCidade()), 
-						Restrictions.eq("estabelecimento.endereco.estado", filtro.getEstado())));
+			if(Strings.isNotEmpty(filtro.getCidade())) {
+				criteria.add(Restrictions.eq("end.cidade", filtro.getCidade()));
 			}
+			
+			if(Strings.isNotEmpty(filtro.getEstado())) {
+				criteria.add(Restrictions.eq("end.estado", filtro.getEstado()));
+			}
+			
 		}
 	}
 	
