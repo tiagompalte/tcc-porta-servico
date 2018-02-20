@@ -67,11 +67,14 @@ public class AnuncioImpl implements AnuncioQueries {
 			if(filtro.getDataInicio() != null && filtro.getDataFinal() != null) {
 				criteria.add(Restrictions.between("dataPublicacao", filtro.getDataInicio(), filtro.getDataFinal()));
 			}
-			
-			if(filtro.isExpirado()) {
-				criteria.add(Restrictions.lt("dataExpiracao", LocalDate.now()));
+			else if(filtro.getDataInicio() != null) {
+				criteria.add(Restrictions.ge("dataPublicacao", filtro.getDataInicio()));
 			}
-			else {
+			else if(filtro.getDataFinal() != null) {
+				criteria.add(Restrictions.le("dataPublicacao", filtro.getDataFinal()));
+			}
+			
+			if(filtro.isExpirado() == false) {
 				criteria.add(Restrictions.ge("dataExpiracao", LocalDate.now()));
 			}
 		}
