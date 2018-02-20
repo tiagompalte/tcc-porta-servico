@@ -1,5 +1,6 @@
 package br.com.utfpr.porta.repositorio.helper.anuncio_usuario;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,20 +9,31 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Root;
 
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.utfpr.porta.modelo.Anuncio;
 import br.com.utfpr.porta.modelo.AnuncioUsuario;
 import br.com.utfpr.porta.modelo.Usuario;
+import br.com.utfpr.porta.repositorio.filtro.AnuncioUsuarioFiltro;
+import br.com.utfpr.porta.repositorio.paginacao.PaginacaoUtil;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
 public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 	
 	@PersistenceContext
 	private EntityManager manager;
+	
+	@Autowired
+	private PaginacaoUtil paginacaoUtil;
 
 	@Transactional
 	public int excluirPorAnuncio(Anuncio anuncio) {
@@ -64,6 +76,51 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 		Criteria criteriaUsr = manager.unwrap(Session.class).createCriteria(Usuario.class);		
 		criteriaUsr.add(Restrictions.in("codigo", listaCodigosUsr));		
 		return criteriaUsr.list();
+	}
+			
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	public Page<Anuncio> filtrar(AnuncioUsuarioFiltro filtro, Pageable pageable) {	
+		
+		if(Strings.isEmpty(filtro.getCidade()) && Strings.isEmpty(filtro.getEstado()) 
+				&& filtro.getFaixaPrecoInicial() == null && filtro.getFaixaPrecoFinal() == null) {
+			return new PageImpl<Anuncio>(new ArrayList<Anuncio>(), pageable, 0);
+		}
+		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Anuncio.class);
+		paginacaoUtil.preparar(criteria, pageable);
+		adicionarFiltro(filtro, criteria);
+		List<Anuncio> filtrados = criteria.list();
+				
+		return new PageImpl<Anuncio>(filtrados, pageable, total(filtro));
+	}
+	
+	private Long total(AnuncioUsuarioFiltro filtro) {
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Anuncio.class);
+		adicionarFiltro(filtro, criteria);
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
+	private void adicionarFiltro(AnuncioUsuarioFiltro filtro, Criteria criteria) {				
+		if (filtro != null) {
+			if(filtro.getFaixaPrecoInicial() != null && filtro.getFaixaPrecoFinal() != null) {
+				criteria.add(Restrictions.between("preco", filtro.getFaixaPrecoInicial(), filtro.getFaixaPrecoFinal()));
+			}
+			else if(filtro.getFaixaPrecoInicial() != null) {
+				criteria.add(Restrictions.ge("preco", filtro.getFaixaPrecoInicial()));
+			}
+			else if(filtro.getFaixaPrecoFinal() != null) {
+				criteria.add(Restrictions.le("preco", filtro.getFaixaPrecoFinal()));
+			}
+			
+			if(Strings.isNotEmpty(filtro.getCidade()) && Strings.isNotEmpty(filtro.getEstado())) {
+				//IMPLEMENTAR COM ALIAS
+				criteria.add(Restrictions.and(
+						Restrictions.eq("estabelecimento.endereco.cidade", filtro.getCidade()), 
+						Restrictions.eq("estabelecimento.endereco.estado", filtro.getEstado())));
+			}
+		}
 	}
 	
 }

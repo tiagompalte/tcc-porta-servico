@@ -8,6 +8,7 @@ public class AnuncioUsuarioFiltro {
 	private String cidade;
 	private BigDecimal faixaPrecoInicial;
 	private BigDecimal faixaPrecoFinal;
+	
 	public String getEstado() {
 		return estado;
 	}
