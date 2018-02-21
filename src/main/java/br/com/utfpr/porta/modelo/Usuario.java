@@ -80,13 +80,7 @@ public class Usuario implements Serializable {
 	
 	@Column(name = "data_hora_alteracao")
 	private LocalDateTime dataHoraAlteracao;
-	
-	@Column(name = "nr_tentativa_acesso_porta")
-	private Integer nrTentativaAcessoPorta;
-	
-	@Column(name = "nr_tentativa_acesso_site")
-	private Integer nrTentativaAcessoSite;
-				
+					
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
@@ -212,38 +206,6 @@ public class Usuario implements Serializable {
 		this.estabelecimento = estabelecimento;
 	}
 		
-	public Integer getNrTentativaAcessoPorta() {
-		return nrTentativaAcessoPorta;
-	}
-
-	public void setNrTentativaAcessoPorta(Integer nrTentativaAcessoPorta) {
-		this.nrTentativaAcessoPorta = nrTentativaAcessoPorta;
-	}
-	
-	public Integer incrementarNrTentativaAcessoPorta(Integer qtdIncremento) {
-		if(qtdIncremento == null || nrTentativaAcessoPorta == null) {
-			return null;
-		}		
-		nrTentativaAcessoPorta += qtdIncremento;
-		return nrTentativaAcessoPorta;
-	}
-
-	public Integer getNrTentativaAcessoSite() {
-		return nrTentativaAcessoSite;
-	}
-
-	public void setNrTentativaAcessoSite(Integer nrTentativaAcessoSite) {
-		this.nrTentativaAcessoSite = nrTentativaAcessoSite;
-	}
-	
-	public Integer incrementarNrTentativaAcessoSite(Integer qtdIncremento) {
-		if(qtdIncremento == null || nrTentativaAcessoSite == null) {
-			return null;
-		}		
-		nrTentativaAcessoSite += qtdIncremento;
-		return nrTentativaAcessoSite;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
