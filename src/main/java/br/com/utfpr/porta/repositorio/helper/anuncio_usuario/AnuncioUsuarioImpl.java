@@ -6,9 +6,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
@@ -26,7 +23,6 @@ import br.com.utfpr.porta.modelo.AnuncioUsuario;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.filtro.AnuncioUsuarioFiltro;
 import br.com.utfpr.porta.repositorio.paginacao.PaginacaoUtil;
-import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
 public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 	
@@ -37,24 +33,16 @@ public class AnuncioUsuarioImpl implements AnuncioUsuarioQueries {
 	private PaginacaoUtil paginacaoUtil;
 
 	@Transactional
-	public int excluirPorAnuncio(Anuncio anuncio) {
+	public List<AnuncioUsuario> obterListaAnuncioUsuarioPorAnuncio(Anuncio anuncio) {
 		
 		if(anuncio == null || anuncio.getCodigo() == null) {
 			throw new NullPointerException("Anúncio não informado");
 		}
-
-		try {			
-			CriteriaBuilder builder = this.manager.getCriteriaBuilder();
-			CriteriaDelete<AnuncioUsuario> criteria = builder.createCriteriaDelete(AnuncioUsuario.class);
-			Root<AnuncioUsuario> root = criteria.from(AnuncioUsuario.class);
-			
-			criteria.where(builder.equal(root.<Anuncio>get("id.anuncio"), anuncio));
-			
-			return this.manager.createQuery(criteria).executeUpdate();
-		}
-		catch(Exception e) {
-			throw new ValidacaoBancoDadosExcecao("Erro ao excluir relação de usuários interessados pelo anúncio");
-		}
+		
+		return manager
+				.createQuery("from AnuncioUsuario where id.anuncio.codigo = ?", AnuncioUsuario.class)
+				.setParameter(1, anuncio.getCodigo())
+				.getResultList();
 	}
 	
 	@Transactional

@@ -2,6 +2,7 @@ package br.com.utfpr.porta.servico;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.PersistenceException;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.utfpr.porta.modelo.Anuncio;
+import br.com.utfpr.porta.modelo.AnuncioUsuario;
 import br.com.utfpr.porta.servico.excecao.CampoNaoInformadoExcecao;
 import br.com.utfpr.porta.servico.excecao.InformacaoInvalidaException;
 import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
@@ -76,7 +78,7 @@ public class AnuncioServico {
 			dataAtual = LocalDate.now();
 		}
 		
-		anuncio.setDataPublicacao(dataAtual);
+		anuncio.setDataExpiracao(dataAtual.minusDays(1));
 		
 		anuncioRepositorio.save(anuncio);
 		
@@ -89,10 +91,21 @@ public class AnuncioServico {
 			throw new NullPointerException("Anúncio não informado");
 		}
 		
-		anuncioUsuarioRepositorio.excluirPorAnuncio(anuncio);
+		List<AnuncioUsuario> listaAnuncioUsuario = anuncioUsuarioRepositorio.obterListaAnuncioUsuarioPorAnuncio(anuncio);
+		
+		if(listaAnuncioUsuario != null && listaAnuncioUsuario.isEmpty() == false) {
+			for(AnuncioUsuario anuncioUsuario : listaAnuncioUsuario) {
+				try {					
+					anuncioUsuarioRepositorio.delete(anuncioUsuario);
+				}
+				catch(Exception e) {
+					throw new ValidacaoBancoDadosExcecao("Erro ao excluir relação de usuários interessados pelo anúncio");
+				}
+			}
+		}
 		
 		try {			
-			anuncioRepositorio.delete(anuncio);
+			anuncioRepositorio.delete(anuncio.getCodigo());
 		}
 		catch(PersistenceException e) {
 			throw new ValidacaoBancoDadosExcecao("Erro ao excluir anúncio");

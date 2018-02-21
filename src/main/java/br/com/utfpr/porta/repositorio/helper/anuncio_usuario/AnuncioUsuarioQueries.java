@@ -6,12 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import br.com.utfpr.porta.modelo.Anuncio;
+import br.com.utfpr.porta.modelo.AnuncioUsuario;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.filtro.AnuncioUsuarioFiltro;
 
 public interface AnuncioUsuarioQueries {
 	
-	public int excluirPorAnuncio(Anuncio anuncio);
+	public List<AnuncioUsuario> obterListaAnuncioUsuarioPorAnuncio(Anuncio anuncio);
 	
 	public List<Usuario> obterListaUsuariosPorAnuncio(Long codigo_anuncio);
 	
