@@ -12,6 +12,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
@@ -132,5 +133,41 @@ public class Endereco implements Serializable {
 			return this.cidade + "/" + this.estado;
 		}
 		return null;
+	}
+	
+	@Override
+	public String toString() {		
+		StringBuilder end = new StringBuilder();
+		end.append(logradouro).append(", ");
+		end.append(Strings.isNotEmpty(numero) ? numero : "s/n").append(", ");
+		end.append(Strings.isNotEmpty(complemento) ? complemento.concat(", ") : "");
+		end.append(Strings.isNotEmpty(bairro) ? bairro.concat(", ") : "");
+		end.append(cidade).append("/").append(estado);		
+		return end.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codigo == null) ? 0 : codigo.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Endereco other = (Endereco) obj;
+		if (codigo == null) {
+			if (other.codigo != null)
+				return false;
+		} else if (!codigo.equals(other.codigo))
+			return false;
+		return true;
 	}
 }
