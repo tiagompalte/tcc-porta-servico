@@ -2,6 +2,7 @@ package br.com.utfpr.porta.repositorio.helper.autorizacao;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -65,7 +66,12 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
-	public Page<Autorizacao> filtrar(AutorizacaoFiltro filtro, Pageable pageable) {		
+	public Page<Autorizacao> filtrar(AutorizacaoFiltro filtro, Pageable pageable) {	
+		
+		if(filtro.getEstabelecimento() == null) {
+			return new PageImpl<Autorizacao>(new ArrayList<>(), pageable, 0);
+		}
+		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Autorizacao.class);		
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);		
