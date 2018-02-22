@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.repositorio.filtro.EstabelecimentoFiltro;
@@ -32,7 +32,8 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 	@Transactional(readOnly = true)
 	public Page<Estabelecimento> filtrar(EstabelecimentoFiltro filtro, Pageable pageable) {		
 		
-		Criteria criteria = manager.unwrap(Session.class).createCriteria(Estabelecimento.class);				
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Estabelecimento.class);
+		criteria.createAlias("endereco", "end");
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		List<Estabelecimento> filtrados = criteria.list();
@@ -49,6 +50,7 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 	
 	private Long total(EstabelecimentoFiltro filtro) {
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Estabelecimento.class);
+		criteria.createAlias("endereco", "end");
 		adicionarFiltro(filtro, criteria);
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
@@ -56,11 +58,11 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 
 	private void adicionarFiltro(EstabelecimentoFiltro filtro, Criteria criteria) {
 		if (filtro != null) {
-			if (filtro.getCidade() != null && !StringUtils.isEmpty(filtro.getCidade())) {
-				criteria.add(Restrictions.eq("endereco.cidade", filtro.getCidade()));
+			if (Strings.isNotEmpty(filtro.getCidade())) {
+				criteria.add(Restrictions.eq("end.cidade", filtro.getCidade()));
 			}
-			if (filtro.getEstado() != null && !StringUtils.isEmpty(filtro.getEstado())) {
-				criteria.add(Restrictions.eq("endereco.estado", filtro.getEstado()));
+			if (Strings.isNotEmpty(filtro.getEstado())) {
+				criteria.add(Restrictions.eq("end.estado", filtro.getEstado()));
 			}
 		}
 	}
