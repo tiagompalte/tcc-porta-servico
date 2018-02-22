@@ -40,6 +40,7 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		if(filtrados != null && filtrados.isEmpty() == false) {
 			for(Estabelecimento est : filtrados) {
 				est.setQuantidadePortas(quantidadePortasPorEstabelecimento(est.getCodigo()));
+				est.setQuantidadeAnuncios(quantidadeAnunciosPorEstabelecimento(est.getCodigo()));
 			}
 		}
 				
@@ -72,6 +73,18 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		
 		return manager
 				.createQuery("select count(*) from Porta where codigo_estabelecimento = :codigo", Long.class)
+				.setParameter("codigo", codigo_estabelecimento)
+				.getSingleResult();
+	}
+	
+	private Long quantidadeAnunciosPorEstabelecimento(Long codigo_estabelecimento) {
+		
+		if(codigo_estabelecimento == null) {
+			throw new NullPointerException("Código do estabelecimento não informado");
+		}
+		
+		return manager
+				.createQuery("select count(*) from Anuncio where codigo_estabelecimento = :codigo", Long.class)
 				.setParameter("codigo", codigo_estabelecimento)
 				.getSingleResult();
 	}

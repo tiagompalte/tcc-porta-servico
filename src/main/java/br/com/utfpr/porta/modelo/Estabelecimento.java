@@ -52,6 +52,9 @@ public class Estabelecimento implements Serializable {
 	@Transient
 	private Long quantidadePortas;
 	
+	@Transient
+	private Long quantidadeAnuncios;
+	
 	@PrePersist
 	private void prePersist() {
 		this.dataHoraCriacao = LocalDateTime.now();
@@ -61,6 +64,12 @@ public class Estabelecimento implements Serializable {
 	@PreUpdate
 	private void preUpdate() {
 		this.dataHoraAlteracao = LocalDateTime.now();
+	}
+	
+	public Estabelecimento() {}
+	
+	public Estabelecimento(Long codigo) {
+		this.codigo = codigo;
 	}
 	
 	public boolean isNovo() {
@@ -117,6 +126,14 @@ public class Estabelecimento implements Serializable {
 
 	public void setQuantidadePortas(Long quantidadePortas) {
 		this.quantidadePortas = quantidadePortas;
+	}
+	
+	public Long getQuantidadeAnuncios() {
+		return quantidadeAnuncios;
+	}
+
+	public void setQuantidadeAnuncios(Long quantidadeAnuncios) {
+		this.quantidadeAnuncios = quantidadeAnuncios;
 	}
 
 	@Override
