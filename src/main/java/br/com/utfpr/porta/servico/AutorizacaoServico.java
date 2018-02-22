@@ -46,7 +46,7 @@ public class AutorizacaoServico {
 			if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.SEMANAL) == 0 && autorizacao.getDiaSemana() == null) {
 				throw new CampoNaoInformadoExcecao("diaSemana", "Campo dia da semana é obrigatório");
 			}
-			else {
+			else if(autorizacao.getTipoAutorizacao().compareTo(TipoAutorizacao.MENSAL) == 0){
 				if(autorizacao.getDiaMes() == null) {
 					throw new CampoNaoInformadoExcecao("diaMes", "Campo dia do mês é obrigatório");
 				}
