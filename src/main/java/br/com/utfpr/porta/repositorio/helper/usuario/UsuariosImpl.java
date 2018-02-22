@@ -55,7 +55,8 @@ public class UsuariosImpl implements UsuariosQueries {
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	public Page<Usuario> filtrar(UsuarioFiltro filtro, Pageable pageable) {		
-		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+		criteria.createAlias("pessoa", "p");
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);		
 		List<Usuario> filtrados = criteria.list();
@@ -64,6 +65,7 @@ public class UsuariosImpl implements UsuariosQueries {
 		
 	private Long total(UsuarioFiltro filtro) {
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+		criteria.createAlias("pessoa", "p");
 		adicionarFiltro(filtro, criteria);
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
@@ -72,7 +74,7 @@ public class UsuariosImpl implements UsuariosQueries {
 	private void adicionarFiltro(UsuarioFiltro filtro, Criteria criteria) {
 		if (filtro != null) {
 			if (!Strings.isEmpty(filtro.getNome())) {
-				criteria.add(Restrictions.ilike("nome", filtro.getNome(), MatchMode.ANYWHERE));
+				criteria.add(Restrictions.ilike("p.nome", filtro.getNome(), MatchMode.ANYWHERE));
 			}
 			
 			if (!Strings.isEmpty(filtro.getEmail())) {
