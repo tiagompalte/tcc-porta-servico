@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.tiagompalte</groupId>
   <artifactId>tcc-porta-servico</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
   <packaging>jar</packaging>
   <name>tcc-porta-servico</name>
   <description>Projeto serviço que realiza acesso ao banco de dados para o projeto API e web</description>
@@ -72,7 +72,10 @@
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 				
 		<!-- AWS SDK - S3 -->
-		<aws-java-sdk-s3.version>1.10.77</aws-java-sdk-s3.version>		
+		<aws-java-sdk-s3.version>1.10.77</aws-java-sdk-s3.version>	
+		
+		<!-- Javax Mail -->
+		<javax-mail.version>1.4.7</javax-mail.version>	
 				
 	</properties>
 	
@@ -287,6 +290,13 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>${aws-java-sdk-s3.version}</version>
+		</dependency>
+		
+		<!-- Javax Mail -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>${javax-mail.version}</version>
 		</dependency>
 						
 	</dependencies>	  

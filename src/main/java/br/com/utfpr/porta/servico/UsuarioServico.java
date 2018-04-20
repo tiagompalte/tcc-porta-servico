@@ -27,6 +27,8 @@ import br.com.utfpr.porta.storage.AudioStorage;
 @Service
 public class UsuarioServico {
 	
+	private static final String PADRAO_SENHA = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%!^&*]).{6,12}$";
+	
 	@Autowired
 	private Usuarios usuariosRepositorio;		
 		
@@ -69,8 +71,8 @@ public class UsuarioServico {
 			}			
 		}
 		else {			
-			if(usuario.getSenhaSite().matches("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%!^&*]).{6,12}$") == false) {
-				throw new CampoNaoInformadoExcecao("senhaSite", "A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 dígitos");
+			if(!usuario.getSenhaSite().matches(PADRAO_SENHA)) {
+				throw new CampoNaoInformadoExcecao("senhaSite", "A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 caracteres");
 			}
 			usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
 			usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());			
@@ -78,20 +80,20 @@ public class UsuarioServico {
 		
 		if(usuario.getGrupos() != null) {		
 			
-			Parametro par_cod_grp_anfitricao = parametroRepositorio.findOne("COD_GRP_ANFITRIAO");
-			Parametro par_cod_grp_usuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
+			Parametro parCodGrpAnfitricao = parametroRepositorio.findOne("COD_GRP_ANFITRIAO");
+			Parametro parCodGrpUsuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
 			
-			if(par_cod_grp_usuario == null) {
+			if(parCodGrpUsuario == null) {
 				throw new NullPointerException("COD_GRP_USUARIO não parametrizado");
 			}
 			
-			if(par_cod_grp_anfitricao == null){
+			if(parCodGrpAnfitricao == null){
 				throw new NullPointerException("COD_GRP_ANFITRIAO não parametrizado");
 			}
 			
 			for(Grupo grupo : usuario.getGrupos()) {	
 				
-				if(grupo.getCodigo().compareTo(par_cod_grp_usuario.getValorLong()) == 0) {
+				if(grupo.getCodigo().compareTo(parCodGrpUsuario.getValorLong()) == 0) {
 					//usuário
 					
 					usuario.setEstabelecimento(null);
@@ -127,7 +129,7 @@ public class UsuarioServico {
 					}
 					
 				}
-				else if(grupo.getCodigo().compareTo(par_cod_grp_anfitricao.getValorLong()) == 0) {
+				else if(grupo.getCodigo().compareTo(parCodGrpAnfitricao.getValorLong()) == 0) {
 					//anfitrião
 					usuario.setSenhaTeclado("");
 					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
@@ -178,8 +180,33 @@ public class UsuarioServico {
 			throw new ImpossivelExcluirEntidadeException("Impossível apagar usuário. Ele possui autorizações relacionadas.");
 		}
 		
-		if(Strings.isEmpty(usuario.getNomeAudio()) == false) {
+		if(Strings.isNotEmpty(usuario.getNomeAudio())) {
 			audioStorage.excluir(usuario.getNomeAudio());
+		}
+		
+	}
+	
+	public void alterarSenhaSite(Usuario usuario, String novaSenha) {
+		
+		if(usuario == null || usuario.getCodigo() == null) {
+			throw new NullPointerException("Usuário não informado");
+		}
+		
+		if(Strings.isEmpty(novaSenha)) {
+			throw new NullPointerException("Nova senha não informada");
+		}
+		
+		if(!novaSenha.matches(PADRAO_SENHA)) {
+			throw new ValidacaoBancoDadosExcecao("A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 caracteres");
+		}
+		usuario.setSenhaSite(this.passwordEncoder.encode(novaSenha));
+		usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());	
+		
+		try {
+			usuariosRepositorio.save(usuario);			
+		}
+		catch(PersistenceException e) {
+			throw new ValidacaoBancoDadosExcecao("Erro ao alterar senha do usuário");
 		}
 		
 	}
