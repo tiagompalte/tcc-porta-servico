@@ -24,12 +24,14 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import br.com.utfpr.porta.validacao.AtributoConfirmacao;
+import br.com.utfpr.porta.validacao.AtributosConfirmacoes;
 
 @Entity
 @Table(name = "usuario")
-@AtributoConfirmacao(atributoSite = "senhaSite", atributoConfirmacaoSite = "confirmacaoSenhaSite", 
-						atributoTeclado = "senhaTeclado", atributoConfirmacaoTeclado = "confirmacaoSenhaTeclado", 
-						message = "Confirmação da senha não confere")
+@AtributosConfirmacoes({
+	@AtributoConfirmacao(atributo="senhaSite", atributoConfirmacao="confirmacaoSenhaSite", message="Confirmação da senha do site não confere"),
+	@AtributoConfirmacao(atributo="senhaTeclado", atributoConfirmacao="confirmacaoSenhaTeclado", message="Confirmação da senha da porta não confere")
+})
 public class Usuario implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
