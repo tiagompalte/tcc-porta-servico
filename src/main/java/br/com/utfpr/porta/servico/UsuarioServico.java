@@ -27,7 +27,8 @@ import br.com.utfpr.porta.storage.AudioStorage;
 @Service
 public class UsuarioServico {
 	
-	private static final String PADRAO_SENHA = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%!^&*]).{6,12}$";
+	private static final String PADRAO_SENHA_SITE = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%!^&*]).{6,12}$";
+	private static final String PADRAO_SENHA_TECLADO = "^\\d{4}$";
 	
 	@Autowired
 	private Usuarios usuariosRepositorio;		
@@ -43,105 +44,119 @@ public class UsuarioServico {
 	
 	@Autowired
 	private AudioStorage audioStorage;
-		
-	@Transactional
-	public Usuario salvar(Usuario usuario) {
+	
+	private void validar(Usuario usuario) {
 		
 		if(usuario == null) {
 			throw new NullPointerException("Entidade usuário está nulo");
 		}
-				
+		
+		if(usuario.getPessoa() == null) {
+			throw new NullPointerException("Dados pessoais não informado");
+		}
+		
+		if(usuario.getGrupos() == null) {	
+			throw new NullPointerException("Grupo do usuário não informado");
+		}
+		
+		if(usuario.isNovo() && Strings.isEmpty(usuario.getSenhaSite())) {
+			throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
+		}
+		
+		if(Strings.isEmpty(usuario.getEmail())) {
+			throw new CampoNaoInformadoExcecao("email", "E-mail é obrigatório o preenchimento");
+		}
+		
 		Optional<Usuario> usuarioExistente = usuariosRepositorio.findByEmail(usuario.getEmail());
 		if (usuarioExistente.isPresent() && !usuarioExistente.get().equals(usuario)) {
 			throw new EmailUsuarioJaCadastradoExcecao("E-mail já cadastrado");
 		}
-		
-		Usuario usuarioBase = null;
-		if(!usuario.isNovo()) {
-			usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
+	}
+	
+	private void validarNovaSenhaSite(Usuario usuario) {
+		if(Strings.isEmpty(usuario.getSenhaSite())) {
+			throw new NullPointerException("Senha do site não informada");
 		}
 		
-		if(Strings.isEmpty(usuario.getSenhaSite())) {
-			if (usuario.isNovo()) {
-				throw new CampoNaoInformadoExcecao("senhaSite", "Senha do site é obrigatória para novo usuário");
+		if(!usuario.getSenhaSite().matches(PADRAO_SENHA_SITE)) {
+			throw new CampoNaoInformadoExcecao("senhaSite", "A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 caracteres");
+		}
+		usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
+		usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());		
+	}
+	
+	private void validarNovaSenhaTeclado(Usuario usuario) {
+		if(Strings.isEmpty(usuario.getSenhaTeclado())) {
+			throw new NullPointerException("Senha do teclado não informada");
+		}
+		
+		if(!usuario.getSenhaTeclado().matches(PADRAO_SENHA_TECLADO)) {
+			throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta deve ter 4 dígitos");
+		}		
+		usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
+		usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
+	}
+	
+	private void validarGrupoUsuario(Usuario usuario) {
+				
+		if(Strings.isEmpty(usuario.getRfid())) {
+			throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
+		}
+		
+		Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfidAndEmailNot(usuario.getRfid(), usuario.getEmail());
+		if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
+			throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
+		}
+
+		validarNovaSenhaTeclado(usuario);
+	}
+	
+	private void verificarSenhasUsuario(Usuario usuario) {
+		
+		if(!usuario.isNovo()) {
+			
+			Usuario usuarioBase = usuariosRepositorio.findOne(usuario.getCodigo());
+			
+			if(usuarioBase == null) {
+				throw new ValidacaoBancoDadosExcecao("Não foi possível encontrar na base de dados o usuário alterado");
 			}
-			else if(usuarioBase != null) {
+			
+			if(Strings.isEmpty(usuario.getSenhaSite())) {
 				usuario.setSenhaSite(usuarioBase.getSenhaSite());
-				usuario.setConfirmacaoSenhaSite(usuarioBase.getSenhaSite());
-			}			
+				usuario.setConfirmacaoSenhaSite(usuarioBase.getSenhaSite());			
+			}	
+			else {
+				validarNovaSenhaSite(usuario);
+			}
+			
+			if(Strings.isEmpty(usuario.getSenhaTeclado())) {
+				usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
+				usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());							
+			}
 		}
 		else {			
-			if(!usuario.getSenhaSite().matches(PADRAO_SENHA)) {
-				throw new CampoNaoInformadoExcecao("senhaSite", "A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 caracteres");
-			}
-			usuario.setSenhaSite(this.passwordEncoder.encode(usuario.getSenhaSite()));
-			usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());			
+			validarNovaSenhaSite(usuario);
+		}
+	}
+			
+	@Transactional
+	public Usuario salvar(Usuario usuario) {
+		
+		validar(usuario);
+						
+		verificarSenhasUsuario(usuario);
+		
+		Parametro parCodGrpUsuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
+		
+		if(parCodGrpUsuario == null) {
+			throw new NullPointerException("COD_GRP_USUARIO não parametrizado");
 		}
 		
-		if(usuario.getGrupos() != null) {		
+		for(Grupo grupo : usuario.getGrupos()) {
 			
-			Parametro parCodGrpAnfitricao = parametroRepositorio.findOne("COD_GRP_ANFITRIAO");
-			Parametro parCodGrpUsuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
-			
-			if(parCodGrpUsuario == null) {
-				throw new NullPointerException("COD_GRP_USUARIO não parametrizado");
+			if(grupo.getCodigo().compareTo(parCodGrpUsuario.getValorLong()) == 0) {
+				validarGrupoUsuario(usuario);				
 			}
-			
-			if(parCodGrpAnfitricao == null){
-				throw new NullPointerException("COD_GRP_ANFITRIAO não parametrizado");
-			}
-			
-			for(Grupo grupo : usuario.getGrupos()) {	
-				
-				if(grupo.getCodigo().compareTo(parCodGrpUsuario.getValorLong()) == 0) {
-					//usuário
-					
-					usuario.setEstabelecimento(null);
-					
-					if(Strings.isEmpty(usuario.getRfid())) {
-						throw new CampoNaoInformadoExcecao("rfid", "Código do cartão RFID é obrigatório");
-					}
-					
-					Optional<Usuario> usuarioExistenteRFID = usuariosRepositorio.findByRfidAndEmailNot(usuario.getRfid(), usuario.getEmail());
-					if (usuarioExistenteRFID.isPresent() && usuarioExistenteRFID.get().getRfid().compareTo(usuario.getRfid()) == 0) {
-						throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
-					}
-					
-//					if(Strings.isEmpty(usuario.getNomeAudio())) {
-//						throw new CampoNaoInformadoExcecao("nomeAudio", "Senha falada não informada");
-//					}
-					
-					if(Strings.isEmpty(usuario.getSenhaTeclado())) {
-						if (usuario.isNovo()) {
-							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta é obrigatória para novo usuário");
-						}
-						else if(usuarioBase != null) {							
-							usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
-							usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());							
-						}
-					}
-					else {					
-						if(usuario.getSenhaTeclado().length() != 4) {
-							throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta deve ter 4 dígitos");
-						}
-						usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
-						usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
-					}
-					
-				}
-				else if(grupo.getCodigo().compareTo(parCodGrpAnfitricao.getValorLong()) == 0) {
-					//anfitrião
-					usuario.setSenhaTeclado("");
-					usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
-				}
-			}
-		}
-		else {
-			throw new NullPointerException("Grupo do usuário não informado");
-		}
-										
-		if(usuario.getPessoa() == null) {
-			throw new NullPointerException("Dados pessoais não informado");
 		}
 				
 		Pessoa pessoaSalva = pessoasRepositorio.save(usuario.getPessoa());
@@ -155,8 +170,7 @@ public class UsuarioServico {
 			usuario.setAtivo(Boolean.TRUE);
 		}
 		
-		return usuariosRepositorio.save(usuario);
-		
+		return usuariosRepositorio.save(usuario);		
 	}
 	
 	@Transactional
@@ -186,21 +200,20 @@ public class UsuarioServico {
 		
 	}
 	
+	@Transactional
 	public void alterarSenhaSite(Usuario usuario, String novaSenha) {
 		
 		if(usuario == null || usuario.getCodigo() == null) {
 			throw new NullPointerException("Usuário não informado");
 		}
 		
-		if(Strings.isEmpty(novaSenha)) {
-			throw new NullPointerException("Nova senha não informada");
-		}
+		usuario.setSenhaSite(novaSenha);
 		
-		if(!novaSenha.matches(PADRAO_SENHA)) {
-			throw new ValidacaoBancoDadosExcecao("A senha do site deve conter uma letra maiúscula, um caracter especial(@,#,$,%,!,^,&,*) e um número. Deve conter de 6 a 12 caracteres");
+		validarNovaSenhaSite(usuario);
+		
+		if(Strings.isNotEmpty(usuario.getSenhaTeclado())) {
+			usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
 		}
-		usuario.setSenhaSite(this.passwordEncoder.encode(novaSenha));
-		usuario.setConfirmacaoSenhaSite(usuario.getSenhaSite());	
 		
 		try {
 			usuariosRepositorio.save(usuario);			

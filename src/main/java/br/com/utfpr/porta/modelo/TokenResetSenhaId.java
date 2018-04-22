@@ -17,6 +17,8 @@ public class TokenResetSenhaId implements Serializable{
 	@JoinColumn(name = "codigo_usuario")
 	private Usuario usuario;
 	
+	public TokenResetSenhaId(){}
+	
 	public TokenResetSenhaId(Usuario usuario) {
 		this.usuario = usuario;
 	}
