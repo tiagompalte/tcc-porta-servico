@@ -62,6 +62,9 @@ public class Usuario implements Serializable {
 	
 	@Transient
 	private String confirmacaoSenhaTeclado;
+	
+	@Transient
+	private boolean senhaTecladoAlterado;
 
 	@ManyToMany
 	@JoinTable(name = "usuario_grupo", joinColumns = @JoinColumn(name = "codigo_usuario"), 
@@ -208,6 +211,14 @@ public class Usuario implements Serializable {
 		this.estabelecimento = estabelecimento;
 	}
 		
+	public boolean isSenhaTecladoAlterado() {
+		return senhaTecladoAlterado;
+	}
+
+	public void setSenhaTecladoAlterado(boolean senhaTecladoAlterado) {
+		this.senhaTecladoAlterado = senhaTecladoAlterado;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

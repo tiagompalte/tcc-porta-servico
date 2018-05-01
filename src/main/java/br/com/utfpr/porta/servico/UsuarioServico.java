@@ -91,7 +91,7 @@ public class UsuarioServico {
 		}
 		
 		if(!usuario.getSenhaTeclado().matches(PADRAO_SENHA_TECLADO)) {
-			throw new CampoNaoInformadoExcecao("senhaPorta", "Senha da porta deve ter 4 dígitos");
+			throw new CampoNaoInformadoExcecao("senhaTeclado", "Senha da porta deve ter 4 dígitos");
 		}		
 		usuario.setSenhaTeclado(this.passwordEncoder.encode(usuario.getSenhaTeclado()));
 		usuario.setConfirmacaoSenhaTeclado(usuario.getSenhaTeclado());
@@ -108,7 +108,9 @@ public class UsuarioServico {
 			throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 		}
 
-		validarNovaSenhaTeclado(usuario);
+		if(usuario.isSenhaTecladoAlterado()) {			
+			validarNovaSenhaTeclado(usuario);
+		}
 	}
 	
 	private void verificarSenhasUsuario(Usuario usuario) {
@@ -131,7 +133,8 @@ public class UsuarioServico {
 			
 			if(Strings.isEmpty(usuario.getSenhaTeclado())) {
 				usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
-				usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());							
+				usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());
+				usuario.setSenhaTecladoAlterado(false);
 			}
 		}
 		else {			
