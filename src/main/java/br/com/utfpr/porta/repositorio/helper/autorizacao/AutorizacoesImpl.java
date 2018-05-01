@@ -68,7 +68,7 @@ public class AutorizacoesImpl implements AutorizacoesQueries {
 	@Transactional(readOnly = true)
 	public Page<Autorizacao> filtrar(AutorizacaoFiltro filtro, Pageable pageable) {	
 		
-		if(filtro.getEstabelecimento() == null) {
+		if(filtro.getEstabelecimento() == null || filtro.getEstabelecimento().getCodigo() == null) {
 			return new PageImpl<Autorizacao>(new ArrayList<>(), pageable, 0);
 		}
 		
