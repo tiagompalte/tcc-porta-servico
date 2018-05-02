@@ -33,7 +33,7 @@ public class AnuncioImpl implements AnuncioQueries {
 	@Transactional(readOnly = true)
 	public Page<Anuncio> filtrar(AnuncioFiltro filtro, Pageable pageable) {	
 		
-		if(filtro.getEstabelecimento() == null) {
+		if(filtro.getEstabelecimento() == null || filtro.getEstabelecimento().getCodigo() == null) {
 			return new PageImpl<Anuncio>(new ArrayList<Anuncio>(), pageable, 0);
 		}
 		
