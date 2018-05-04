@@ -82,13 +82,13 @@ public class UsuariosImpl implements UsuariosQueries {
 			}					
 		}
 		
-		Parametro par_cod_grp_usuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
-		if(par_cod_grp_usuario == null || Strings.isEmpty(par_cod_grp_usuario.getValor())) {
+		Parametro codGrpUsuario = parametroRepositorio.findOne("COD_GRP_USUARIO");
+		if(codGrpUsuario == null || Strings.isEmpty(codGrpUsuario.getValor())) {
 			throw new NullPointerException("COD_GRP_USUARIO não foi parametrizado");
 		}
 		
 		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
-		criteria.add(Restrictions.eq("g.codigo", par_cod_grp_usuario.getValorLong()));
+		criteria.add(Restrictions.eq("g.codigo", codGrpUsuario.getValorLong()));
 	}
 
 	@Transactional(readOnly = true)
@@ -102,16 +102,16 @@ public class UsuariosImpl implements UsuariosQueries {
 	
 	@SuppressWarnings("unchecked") 
 	@Transactional(readOnly = true)
-	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupo_codigo) {
+	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupoCodigo) {
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
 		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
-		criteria.add(Restrictions.eq("g.codigo", grupo_codigo));
+		criteria.add(Restrictions.eq("g.codigo", grupoCodigo));
 		criteria.add(Restrictions.eq("ativo", true));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
 	}
 	
-	@Transactional()
+	@Transactional
 	public int apagarNomeAudio(String nomeAudio) {
 		
 		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
@@ -119,7 +119,30 @@ public class UsuariosImpl implements UsuariosQueries {
 		Root<Usuario> root = criteria.from(Usuario.class);
 
 		criteria.set("nomeAudio", null)
-			.where(builder.lessThan(root.<String>get("nomeAudio"), nomeAudio));
+			.where(builder.equal(root.<String>get("nomeAudio"), nomeAudio));
+		
+		return this.manager.createQuery(criteria).executeUpdate();
+	}
+
+	@Transactional(readOnly = true)
+	@SuppressWarnings("unchecked")
+	public Optional<Usuario> porEmailEAtivoComGrupos(String email) {		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+		criteria.createAlias("grupos", "g", JoinType.LEFT_OUTER_JOIN);
+		criteria.add(Restrictions.eq("email", email));
+		criteria.add(Restrictions.eq("ativo", Boolean.TRUE));		
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		return criteria.list().stream().findFirst();
+	}
+
+	@Transactional
+	public int gravarNomeAudio(Long codigoUsuario, String nomeAudio) {
+		CriteriaBuilder builder = this.manager.getCriteriaBuilder();
+		CriteriaUpdate<Usuario> criteria = builder.createCriteriaUpdate(Usuario.class);
+		Root<Usuario> root = criteria.from(Usuario.class);
+
+		criteria.set("nomeAudio", nomeAudio)
+			.where(builder.equal(root.<Long>get("codigo"), codigoUsuario));
 		
 		return this.manager.createQuery(criteria).executeUpdate();
 	}

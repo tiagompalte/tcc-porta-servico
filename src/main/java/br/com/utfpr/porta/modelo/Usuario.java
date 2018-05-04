@@ -2,6 +2,7 @@ package br.com.utfpr.porta.modelo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -179,6 +180,13 @@ public class Usuario implements Serializable {
 		this.grupos = grupos;
 	}
 	
+	public void addGrupo(Grupo grupo) {
+		if(grupos == null) {
+			grupos = new ArrayList<>();
+		}
+		grupos.add(grupo);
+	}
+	
 	public String getRfid() {
 		return rfid;
 	}
@@ -218,7 +226,7 @@ public class Usuario implements Serializable {
 	public void setSenhaTecladoAlterado(boolean senhaTecladoAlterado) {
 		this.senhaTecladoAlterado = senhaTecladoAlterado;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

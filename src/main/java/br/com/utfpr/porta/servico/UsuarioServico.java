@@ -108,7 +108,7 @@ public class UsuarioServico {
 			throw new RfidUsuarioJaCadastradoExcecao("RFID já cadastrado");
 		}
 
-		if(usuario.isSenhaTecladoAlterado()) {			
+		if(usuario.isNovo() || usuario.isSenhaTecladoAlterado()) {			
 			validarNovaSenhaTeclado(usuario);
 		}
 	}
@@ -131,10 +131,11 @@ public class UsuarioServico {
 				validarNovaSenhaSite(usuario);
 			}
 			
-			if(Strings.isEmpty(usuario.getSenhaTeclado())) {
+			usuario.setSenhaTecladoAlterado(Strings.isNotEmpty(usuario.getSenhaTeclado()));
+			
+			if(Strings.isEmpty(usuario.getSenhaTeclado()) && Strings.isNotEmpty(usuarioBase.getSenhaTeclado())) {
 				usuario.setSenhaTeclado(usuarioBase.getSenhaTeclado());
 				usuario.setConfirmacaoSenhaTeclado(usuarioBase.getSenhaTeclado());
-				usuario.setSenhaTecladoAlterado(false);
 			}
 		}
 		else {			

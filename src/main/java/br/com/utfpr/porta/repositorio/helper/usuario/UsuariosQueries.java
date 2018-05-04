@@ -19,8 +19,12 @@ public interface UsuariosQueries {
 	
 	public Usuario buscarComGrupos(Long codigo);
 	
-	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupo_codigo);
+	public List<Usuario> buscarPorGrupoCodigoAndAtivo(Long grupoCodigo);
 	
 	public int apagarNomeAudio(String nomeAudio);
+	
+	public int gravarNomeAudio(Long codigoUsuario, String nomeAudio);
+	
+	public Optional<Usuario> porEmailEAtivoComGrupos(String email);
 	
 }
