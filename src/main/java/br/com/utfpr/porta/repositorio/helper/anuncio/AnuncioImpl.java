@@ -34,7 +34,7 @@ public class AnuncioImpl implements AnuncioQueries {
 	public Page<Anuncio> filtrar(AnuncioFiltro filtro, Pageable pageable) {	
 		
 		if(filtro.getEstabelecimento() == null || filtro.getEstabelecimento().getCodigo() == null) {
-			return new PageImpl<Anuncio>(new ArrayList<Anuncio>(), pageable, 0);
+			return new PageImpl(new ArrayList<Anuncio>(), pageable, 0);
 		}
 		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Anuncio.class);		
@@ -48,7 +48,7 @@ public class AnuncioImpl implements AnuncioQueries {
 			}
 		}
 				
-		return new PageImpl<Anuncio>(filtrados, pageable, total(filtro));
+		return new PageImpl(filtrados, pageable, total(filtro));
 	}
 	
 	private Long total(AnuncioFiltro filtro) {
@@ -74,21 +74,21 @@ public class AnuncioImpl implements AnuncioQueries {
 				criteria.add(Restrictions.le("dataPublicacao", filtro.getDataFinal()));
 			}
 			
-			if(filtro.isExpirado() == false) {
+			if(!filtro.isExpirado()) {
 				criteria.add(Restrictions.ge("dataExpiracao", LocalDate.now()));
 			}
 		}
 	}
 	
-	private Long obterQtdeUsuariosInteressadosPorAnuncio(Long codigo_anuncio) {
+	private Long obterQtdeUsuariosInteressadosPorAnuncio(Long codigoAnuncio) {
 		
-		if(codigo_anuncio == null) {
+		if(codigoAnuncio == null) {
 			throw new NullPointerException("Código do anúncio não informado");
 		}
 		
 		return manager
 				.createQuery("select count(*) from AnuncioUsuario where codigo_anuncio = :codigo", Long.class)
-				.setParameter("codigo", codigo_anuncio)
+				.setParameter("codigo", codigoAnuncio)
 				.getSingleResult();		
 	}
 

@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,15 @@ public class LogsImpl implements LogsQueries {
 	public Page<Log> filtrar(Estabelecimento estabelecimento, LocalDateTime dataHoraInicio, LocalDateTime dataHoraFinal, Pageable pageable) {
 		
 		if(dataHoraInicio == null || dataHoraFinal == null) {
-			return new PageImpl<Log>(new ArrayList<Log>(), pageable, 0);
+			return new PageImpl(new ArrayList<Log>(), pageable, 0);
 		}
 		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Log.class);
+		criteria.addOrder(Order.desc("dataHora"));
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(estabelecimento, dataHoraInicio, dataHoraFinal, criteria);		
 		List<Log> filtrados = criteria.list();
-		return new PageImpl<Log>(filtrados, pageable, total(estabelecimento, dataHoraInicio, dataHoraFinal));
+		return new PageImpl(filtrados, pageable, total(estabelecimento, dataHoraInicio, dataHoraFinal));
 	}
 	
 	private Long total(Estabelecimento estabelecimento, LocalDateTime dataHoraInicio, LocalDateTime dataHoraFinal) {

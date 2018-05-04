@@ -13,6 +13,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -57,10 +58,11 @@ public class UsuariosImpl implements UsuariosQueries {
 	public Page<Usuario> filtrar(UsuarioFiltro filtro, Pageable pageable) {		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
 		criteria.createAlias("pessoa", "p");
+		criteria.addOrder(Order.asc("p.nome"));
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);		
 		List<Usuario> filtrados = criteria.list();
-		return new PageImpl<Usuario>(filtrados, pageable, total(filtro));
+		return new PageImpl(filtrados, pageable, total(filtro));
 	}
 		
 	private Long total(UsuarioFiltro filtro) {

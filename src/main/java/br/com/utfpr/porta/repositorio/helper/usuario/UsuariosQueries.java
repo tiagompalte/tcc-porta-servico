@@ -26,5 +26,5 @@ public interface UsuariosQueries {
 	public int gravarNomeAudio(Long codigoUsuario, String nomeAudio);
 	
 	public Optional<Usuario> porEmailEAtivoComGrupos(String email);
-	
+		
 }

@@ -227,6 +227,13 @@ public class Usuario implements Serializable {
 		this.senhaTecladoAlterado = senhaTecladoAlterado;
 	}
 	
+	public boolean isPertenceAoGrupo(Long codigoGrupo) {
+		if(getGrupos() != null && codigoGrupo != null) {			
+			return getGrupos().stream().anyMatch(g -> g.getCodigo().equals(codigoGrupo));
+		}
+		return false;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

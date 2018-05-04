@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +35,19 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Estabelecimento.class);
 		criteria.createAlias("endereco", "end");
+		criteria.addOrder(Order.asc("codigo"));
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		List<Estabelecimento> filtrados = criteria.list();
 		
-		if(filtrados != null && filtrados.isEmpty() == false) {
+		if(filtrados != null && !filtrados.isEmpty()) {
 			for(Estabelecimento est : filtrados) {
 				est.setQuantidadePortas(quantidadePortasPorEstabelecimento(est.getCodigo()));
 				est.setQuantidadeAnuncios(quantidadeAnunciosPorEstabelecimento(est.getCodigo()));
 			}
 		}
 				
-		return new PageImpl<Estabelecimento>(filtrados, pageable, total(filtro));
+		return new PageImpl(filtrados, pageable, total(filtro));
 	}
 	
 	private Long total(EstabelecimentoFiltro filtro) {
@@ -67,27 +69,27 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		}
 	}
 		
-	private Long quantidadePortasPorEstabelecimento(Long codigo_estabelecimento) {
+	private Long quantidadePortasPorEstabelecimento(Long codigoEstabelecimento) {
 		
-		if(codigo_estabelecimento == null) {
+		if(codigoEstabelecimento == null) {
 			throw new NullPointerException("Código do estabelecimento não informado");
 		}
 		
 		return manager
 				.createQuery("select count(*) from Porta where codigo_estabelecimento = :codigo", Long.class)
-				.setParameter("codigo", codigo_estabelecimento)
+				.setParameter("codigo", codigoEstabelecimento)
 				.getSingleResult();
 	}
 	
-	private Long quantidadeAnunciosPorEstabelecimento(Long codigo_estabelecimento) {
+	private Long quantidadeAnunciosPorEstabelecimento(Long codigoEstabelecimento) {
 		
-		if(codigo_estabelecimento == null) {
+		if(codigoEstabelecimento == null) {
 			throw new NullPointerException("Código do estabelecimento não informado");
 		}
 		
 		return manager
 				.createQuery("select count(*) from Anuncio where codigo_estabelecimento = :codigo", Long.class)
-				.setParameter("codigo", codigo_estabelecimento)
+				.setParameter("codigo", codigoEstabelecimento)
 				.getSingleResult();
 	}
 
