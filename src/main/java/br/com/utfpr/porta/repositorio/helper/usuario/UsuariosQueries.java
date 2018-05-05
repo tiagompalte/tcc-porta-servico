@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.filtro.UsuarioFiltro;
 
@@ -26,5 +27,7 @@ public interface UsuariosQueries {
 	public int gravarNomeAudio(Long codigoUsuario, String nomeAudio);
 	
 	public Optional<Usuario> porEmailEAtivoComGrupos(String email);
+	
+	public List<Usuario> obterListaPorVinculoEstabelecimento(Estabelecimento estabelecimento);
 		
 }

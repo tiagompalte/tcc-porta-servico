@@ -8,7 +8,6 @@ import javax.persistence.PersistenceContext;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,6 @@ public class EstabelecimentosImpl implements EstabelecimentosQueries {
 		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Estabelecimento.class);
 		criteria.createAlias("endereco", "end");
-		criteria.addOrder(Order.asc("codigo"));
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		List<Estabelecimento> filtrados = criteria.list();

@@ -8,7 +8,6 @@ import javax.persistence.PersistenceContext;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +32,7 @@ public class PortasImpl implements PortasQueries {
 	@SuppressWarnings("unchecked")
 	@Transactional(readOnly = true)
 	public Page<Porta> filtrar(PortaFiltro filtro, Pageable pageable) {
-		Criteria criteria = manager.unwrap(Session.class).createCriteria(Porta.class);
-		criteria.addOrder(Order.asc("codigo"));
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Porta.class);		
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);
 		

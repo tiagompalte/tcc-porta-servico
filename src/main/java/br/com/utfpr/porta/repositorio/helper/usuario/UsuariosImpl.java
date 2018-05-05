@@ -12,9 +12,10 @@ import javax.persistence.criteria.Root;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.utfpr.porta.modelo.Autorizacao;
+import br.com.utfpr.porta.modelo.Estabelecimento;
 import br.com.utfpr.porta.modelo.Parametro;
 import br.com.utfpr.porta.modelo.Usuario;
 import br.com.utfpr.porta.repositorio.Parametros;
@@ -58,7 +61,6 @@ public class UsuariosImpl implements UsuariosQueries {
 	public Page<Usuario> filtrar(UsuarioFiltro filtro, Pageable pageable) {		
 		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
 		criteria.createAlias("pessoa", "p");
-		criteria.addOrder(Order.asc("p.nome"));
 		paginacaoUtil.preparar(criteria, pageable);
 		adicionarFiltro(filtro, criteria);		
 		List<Usuario> filtrados = criteria.list();
@@ -147,6 +149,22 @@ public class UsuariosImpl implements UsuariosQueries {
 			.where(builder.equal(root.<Long>get("codigo"), codigoUsuario));
 		
 		return this.manager.createQuery(criteria).executeUpdate();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	public List<Usuario> obterListaPorVinculoEstabelecimento(Estabelecimento estabelecimento) {
+		
+		Criteria criteria = manager.unwrap(Session.class).createCriteria(Usuario.class);
+		
+		DetachedCriteria aut = DetachedCriteria.forClass(Autorizacao.class, "aut");
+		aut.add(Restrictions.eq("id.estabelecimento", estabelecimento));
+		aut.setProjection(Property.forName("aut.id.usuario.codigo"));
+		
+		criteria.add(Property.forName("codigo").in(aut));
+		
+		return criteria.list();
 	}
 		
 }
