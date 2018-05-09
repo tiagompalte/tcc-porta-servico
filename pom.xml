@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.tiagompalte</groupId>
   <artifactId>tcc-porta-servico</artifactId>
-  <version>1.0.11</version>
+  <version>1.0.12</version>
   <packaging>jar</packaging>
   <name>tcc-porta-servico</name>
   <description>Projeto serviço que realiza acesso ao banco de dados para o projeto API e web</description>

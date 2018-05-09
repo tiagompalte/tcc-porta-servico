@@ -2,7 +2,7 @@ package br.com.utfpr.porta.modelo;
 
 public enum TipoAutorizacao {
 	
-	PERMANENTE("Permanete"),
+	PERMANENTE("Permanente"),
 	TEMPORARIO("Temporário"),
 	SEMANAL("Semanal"),
 	MENSAL("Mensal");
