@@ -76,7 +76,7 @@ public class PortaServico {
 			}	
 			
 			//Só é possível alterar porta, informando a senha da porta
-			if(!passwordEncoder.matches(porta.getSenha(), portaBase.getSenha())) {					
+			if(!(passwordEncoder.matches(porta.getSenha(), portaBase.getSenha()) || porta.getSenha().equals(portaBase.getSenha()))) {					
 				throw new ValidacaoBancoDadosExcecao("Senha não confere");
 			}
 			
