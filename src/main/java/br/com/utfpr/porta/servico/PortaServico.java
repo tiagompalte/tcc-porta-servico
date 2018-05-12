@@ -4,10 +4,11 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import br.com.utfpr.porta.modelo.Autorizacao;
 import br.com.utfpr.porta.modelo.Estabelecimento;
@@ -17,10 +18,11 @@ import br.com.utfpr.porta.repositorio.Autorizacoes;
 import br.com.utfpr.porta.repositorio.Parametros;
 import br.com.utfpr.porta.repositorio.Portas;
 import br.com.utfpr.porta.servico.excecao.ImpossivelExcluirEntidadeException;
+import br.com.utfpr.porta.servico.excecao.ValidacaoBancoDadosExcecao;
 
 @Service
 public class PortaServico {
-	
+		
 	@Autowired
 	private Portas portasRepositorio;
 	
@@ -29,6 +31,16 @@ public class PortaServico {
 	
 	@Autowired
 	private Parametros parametrosRepositorio;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	private boolean portaPossuiAutorizacoes(Porta porta) {
+		
+		List<Autorizacao> listaAutorizacao = autorizacoesRepositorio.findByCodigoPorta(porta.getCodigo());
+		
+		return listaAutorizacao != null && !listaAutorizacao.isEmpty();		
+	}
 			
 	@Transactional
 	public void salvar(Porta porta) {
@@ -38,43 +50,44 @@ public class PortaServico {
 		}
 		
 		if(porta.getEstabelecimento() == null) {
-			Parametro par_cod_est_sistema = parametrosRepositorio.findOne("COD_EST_SISTEMA");
 			
-			if(par_cod_est_sistema == null || StringUtils.isEmpty(par_cod_est_sistema.getValor())) {
+			Parametro parCodEstSistema = parametrosRepositorio.findOne("COD_EST_SISTEMA");
+			
+			if(parCodEstSistema == null || Strings.isEmpty(parCodEstSistema.getValor())) {
 				throw new NullPointerException("COD_EST_SISTEMA não parametrizado");
 			}
 			
-			Estabelecimento estabelecimento = new Estabelecimento();
-			estabelecimento.setCodigo(par_cod_est_sistema.getValorLong());
-			porta.setEstabelecimento(estabelecimento);
+			porta.setEstabelecimento(new Estabelecimento(parCodEstSistema.getValorLong()));
+		}
+		
+		if(!porta.isNovo()) {
+			
+			Porta portaBase = portasRepositorio.findOne(porta.getCodigo());
+			
+			if(portaBase == null) {
+				throw new ValidacaoBancoDadosExcecao("Não foi possível encontrar essa porta na base de dados");
+			}
+			
+			//Só é possível alterar estabelecimento da porta se ela não tiver nenhuma autorização vinculada
+			if(portaBase.getEstabelecimento() != null && porta.getEstabelecimento() != null 
+					&& !porta.getEstabelecimento().equals(portaBase.getEstabelecimento())
+					&& portaPossuiAutorizacoes(porta)) {
+				throw new ImpossivelExcluirEntidadeException("Impossível excluir porta. Ele possui autorizações vinculadas");				
+			}	
+			
+			//Só é possível alterar porta, informando a senha da porta
+			if(!passwordEncoder.matches(porta.getSenha(), portaBase.getSenha())) {					
+				throw new ValidacaoBancoDadosExcecao("Senha não confere");
+			}
+			
+		}
+		else {
+			porta.setSenha(this.passwordEncoder.encode(porta.getSenha()));
 		}
 						
 		portasRepositorio.save(porta);
 	}
-	
-	@Transactional
-	public void modificarEstabelecimento(Porta porta, Estabelecimento estabelecimento) {
 		
-		if(porta == null) {
-			throw new NullPointerException("Porta não informada");
-		}
-		
-		if(estabelecimento == null) {
-			throw new NullPointerException("Estabelecimento não informado");
-		}
-		
-		porta.setEstabelecimento(estabelecimento);
-		
-		List<Autorizacao> listaAutorizacao = autorizacoesRepositorio.findByCodigoPorta(porta.getCodigo());
-		
-		if(listaAutorizacao != null && listaAutorizacao.isEmpty() == false) {
-			throw new ImpossivelExcluirEntidadeException("Impossível excluir porta. Ele possui autorizações vinculadas.");
-		}
-		
-		portasRepositorio.save(porta);
-		
-	}
-	
 	@Transactional
 	public void excluir(Long codigo) {
 		
@@ -87,7 +100,7 @@ public class PortaServico {
 			portasRepositorio.flush();
 		}
 		catch(PersistenceException e) {
-			throw new ImpossivelExcluirEntidadeException("Impossível excluir porta. Ele possui autorizações vinculadas.");
+			throw new ImpossivelExcluirEntidadeException("Impossível excluir porta. Ele possui autorizações vinculadas");
 		}
 		
 	}
