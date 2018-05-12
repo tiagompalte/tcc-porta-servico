@@ -49,7 +49,7 @@ public class PortaServico {
 			throw new NullPointerException("Porta não informada");
 		}
 		
-		if(porta.getEstabelecimento() == null) {
+		if(porta.isNovo() || porta.getEstabelecimento() == null) {
 			
 			Parametro parCodEstSistema = parametrosRepositorio.findOne("COD_EST_SISTEMA");
 			
