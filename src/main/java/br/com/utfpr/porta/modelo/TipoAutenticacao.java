@@ -1,12 +1,13 @@
 package br.com.utfpr.porta.modelo;
 
-public enum Acao {
+public enum TipoAutenticacao {
 	
-	ENTRAR_PORTA("%s na porta %s. Autorizado por %s");
+	SENHA_DIGITADA("senha digitada"),
+	SENHA_FALADA("senha falada");
 	
 	private String descricao;
 	
-	Acao(String descricao) {
+	TipoAutenticacao(String descricao) {
 		this.descricao = descricao;
 	}
 	
