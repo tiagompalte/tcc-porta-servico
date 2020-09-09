@@ -52,7 +52,7 @@
 		<spring-security.version>4.1.1.RELEASE</spring-security.version>
 				
 		<!-- Bean Validation / Hibernate Validator -->
-		<hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+		<hibernate-validator.version>5.3.6.Final</hibernate-validator.version>
 		
 		<!-- Logging -->
 		<log4j.version>2.6</log4j.version>
