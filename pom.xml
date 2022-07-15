@@ -71,7 +71,7 @@
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 				
 		<!-- AWS SDK - S3 -->
-		<aws-java-sdk-s3.version>1.10.77</aws-java-sdk-s3.version>	
+		<aws-java-sdk-s3.version>1.12.261</aws-java-sdk-s3.version>	
 		
 		<!-- Javax Mail -->
 		<javax-mail.version>1.4.7</javax-mail.version>	
